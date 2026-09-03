@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة السبعات للفرق - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            background-image: linear-gradient(rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .floating-card { animation: float-slow 4s ease-in-out infinite; }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+            50% { transform: scale(1.04); box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            20% { transform: translate(-3px, 0px) rotate(-1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-1px, 2px) rotate(0deg); }
+            80% { transform: translate(-3px, 1px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .lucky-seven {
+            animation: shake 0.4s ease-in-out infinite, pulse-glow 1.2s infinite;
+            border: 2px solid #10b981 !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .option-btn {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-selected {
+            border-color: #10b981 !important;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.15)) !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+            transform: scale(1.03);
+        }
+
+        @keyframes firework-burst {
+            0% { transform: translateY(0) scale(0.2); opacity: 0; }
+            50% { opacity: 1; transform: translateY(-180px) scale(1.3); }
+            100% { transform: translateY(-380px) scale(0.8); opacity: 0; }
+        }
+        .celebrate-particle {
+            position: absolute;
+            animation: firework-burst 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            font-size: 32px;
+            pointer-events: none;
+            z-index: 60;
+        }
+
+        @keyframes lightning-flash {
+            0%, 100% { opacity: 0; background-color: transparent; }
+            10%, 30% { opacity: 0.25; background-color: #38bdf8; }
+            20% { opacity: 0; }
+        }
+        .lightning-effect {
+            position: fixed; inset: 0; pointer-events: none; z-index: 55;
+            animation: lightning-flash 1.5s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative">
+
+    <div id="lightning-container" class="lightning-effect hidden"></div>
+    <div id="fireworks-container" class="absolute inset-0 pointer-events-none overflow-hidden hidden"></div>
+
+    <div class="bg-slate-900/95 border border-emerald-500/40 rounded-3xl p-6 md:p-8 max-w-xl w-full shadow-2xl backdrop-blur-md relative z-10 floating-card">
+
+        <!-- رأس الصفحة -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-extrabold text-emerald-400 tracking-wide animate-pulse">🔥 نظام السبعات للفرق المطور 🔥</h1>
+            <p class="text-slate-400 text-xs mt-1">تحدي المجموعات والأدوار المتسلسلة!</p>
+        </div>
+
+        <!-- 1. شاشة الإعدادات -->
+        <div id="setup-screen" class="space-y-4">
+            <!-- نمط اللعب -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">اختر نمط اللعب:</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="setMode('solo')" id="btn-mode-solo" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2 option-selected">
+                        <span>فردي (شخص ضد شخص)</span>
+                        <span class="text-lg">👤</span>
+                    </button>
+                    <button type="button" onclick="setMode('teams')" id="btn-mode-teams" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2">
+                        <span>فرق (مجموعات)</span>
+                        <span class="text-lg">👥</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- إعدادات عدد أعضاء الفريق (تظهر فقط بنمط الفرق) -->
+            <div id="team-size-container" class="hidden space-y-2 bg-slate-800/40 p-3 rounded-2xl border border-slate-700">
+                <label class="block text-xs font-semibold text-amber-400">عدد اللاعبين في كل فريق:</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="setTeamSize(2)" id="btn-ts-2" class="option-btn p-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold option-selected">2 لاعبين</button>
+                    <button type="button" onclick="setTeamSize(3)" id="btn-ts-3" class="option-btn p-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">3 لاعبين</button>
+                    <button type="button" onclick="setTeamSize(4)" id="btn-ts-4" class="option-btn p-2 rounded-xl border border-slate-700 bg-slate-800 text-xs font-bold">4 لاعبين</button>
+                </div>
+            </div>
+
+            <!-- إدخال أسماء الفرق واللاعبين الديناميكي -->
+            <div id="names-inputs" class="space-y-3 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <!-- فردي افتراضي -->
+                <div id="solo-inputs" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-cyan-400 mb-1">اسم اللاعب الأول:</label>
+                        <input type="text" id="p1-name" value="حمودي" class="w-full bg-slate-900 border border-cyan-500/50 rounded-xl p-2.5 text-sm text-white focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-pink-400 mb-1">اسم اللاعب الثاني:</label>
+                        <input type="text" id="p2-name" value="الخصم" class="w-full bg-slate-900 border border-pink-500/50 rounded-xl p-2.5 text-sm text-white focus:outline-none">
+                    </div>
+                </div>
+                <!-- فرق ديناميكي -->
+                <div id="teams-dynamic-inputs" class="space-y-4 hidden"></div>
+            </div>
+
+            <!-- حدود الأرقام -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">حدد مجال الأرقام (الحظ):</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="setRange(1)" id="btn-range-1" class="option-btn p-3 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-xs text-center option-selected">1 إلى 9</button>
+                    <button type="button" onclick="setRange(2)" id="btn-range-2" class="option-btn p-3 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-xs text-center">10 إلى 99</button>
+                    <button type="button" onclick="setRange(3)" id="btn-range-3" class="option-btn p-3 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-xs text-center">100 إلى 999</button>
+                </div>
+            </div>
+
+            <!-- عدد النقاط -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">عدد النقاط المطلوبة للفوز:</label>
+                <input type="number" id="target-points" value="5" min="1" max="50" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-emerald-500 text-center font-bold">
+            </div>
+
+            <button onclick="startGame()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-base mt-2 option-btn">
+                بدء معركة السبعات الاحترافية 🚀
+            </button>
+        </div>
+
+        <!-- 2. شاشة اللعب النشطة -->
+        <div id="game-screen" class="hidden space-y-5 text-center">
+
+            <!-- مؤشر الدور الحالي واسم اللاعب المتسلسل -->
+            <div class="bg-slate-800/90 p-3 rounded-xl border border-emerald-500/50 flex flex-col gap-1 text-xs shadow-md">
+                <div class="flex justify-between items-center text-slate-300">
+                    <span id="target-goal-text" class="font-bold text-amber-400">هدف الفوز: 5 نقاط</span>
+                    <span id="current-team-turn" class="font-extrabold text-teal-300">دور الفريق الأول</span>
+                </div>
+                <div class="text-sm font-black text-emerald-400 bg-slate-900/80 py-1.5 px-3 rounded-lg border border-emerald-500/30">
+                    🎲 اللاعب الحالي: <span id="current-player-name" class="text-white underline decoration-emerald-400">أحمد</span>
+                </div>
+            </div>
+
+            <!-- لوحة النتائج وقوائم اللاعبين الجانبية -->
+            <div class="grid grid-cols-2 gap-3">
+                <!-- الفريق الأول -->
+                <div id="box-1" class="bg-cyan-950/40 border border-cyan-500/40 p-3 rounded-xl text-left transition-all">
+                    <div id="display-team1" class="text-xs font-extrabold text-cyan-400 border-b border-cyan-500/30 pb-1 mb-1 text-center">فريق الصقور</div>
+                    <div id="score-1" class="text-2xl font-extrabold text-white text-center mt-1">0</div>
+                    <div id="roster-1" class="mt-2 space-y-1 text-[11px] text-cyan-200/80 border-t border-cyan-500/20 pt-1"></div>
+                </div>
+                <!-- الفريق الثاني -->
+                <div id="box-2" class="bg-pink-950/40 border border-pink-500/40 p-3 rounded-xl text-left transition-all">
+                    <div id="display-team2" class="text-xs font-extrabold text-pink-400 border-b border-pink-500/30 pb-1 mb-1 text-center">فريق النمور</div>
+                    <div id="score-2" class="text-2xl font-extrabold text-white text-center mt-1">0</div>
+                    <div id="roster-2" class="mt-2 space-y-1 text-[11px] text-pink-200/80 border-t border-pink-500/20 pt-1"></div>
+                </div>
+            </div>
+
+            <!-- صندوق الرقم المتحرك -->
+            <div class="my-6 flex justify-center">
+                <div id="number-display" class="w-32 h-32 bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-700 rounded-3xl shadow-2xl flex flex-col items-center justify-center relative">
+                    <span id="badge-status" class="absolute -top-3 px-3 py-0.5 rounded-full text-[10px] font-bold hidden shadow-md">حالة مميزة</span>
+                    <span id="rolled-number" class="text-5xl font-black text-emerald-400">?</span>
+                </div>
+            </div>
+
+            <div id="action-message" class="text-xs font-bold text-amber-300 min-h-[35px] flex items-center justify-center">
+                اضغط على زر السحب لاختبار حظ اللاعب الحالي!
+            </div>
+
+            <button id="draw-btn" onclick="drawNumber()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-extrabold p-4 rounded-2xl transition shadow-xl shadow-teal-600/40 text-base option-btn">
+                🎲 سحب الرقم الحظي الآن
+            </button>
+
+            <button onclick="resetGame()" class="text-xs text-slate-400 hover:text-red-400 transition underline mt-2 block mx-auto">
+                إعادة ضبط الإعدادات
+            </button>
+        </div>
+
+        <div class="mt-6 pt-3 border-t border-slate-800 text-center">
+            <a href="{{ url_for('home') }}" class="text-xs text-slate-400 hover:text-emerald-400 transition">
+                ← العودة للقائمة الرئيسية
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        let gameMode = 'solo';
+        let teamSize = 2;
+        let rangeType = 1;
+        let targetPoints = 5;
+
+        let score1 = 0;
+        let score2 = 0;
+
+        let team1Name = "فريق الصقور";
+        let team2Name = "فريق النمور";
+        let team1Players = ["أحمد", "حسن"];
+        let team2Players = ["علي", "مصطفى"];
+
+        let currentTeamTurn = 1; // 1 or 2
+        let pIndex1 = 0; // مؤشر دور اللاعب الحالي في الفريق الأول
+        let pIndex2 = 0; // مؤشر دور اللاعب الحالي في الفريق الثاني
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('btn-mode-solo').classList.toggle('option-selected', mode === 'solo');
+            document.getElementById('btn-mode-teams').classList.toggle('option-selected', mode === 'teams');
+
+            const sizeContainer = document.getElementById('team-size-container');
+            const soloInputs = document.getElementById('solo-inputs');
+            const dynamicInputs = document.getElementById('teams-dynamic-inputs');
+
+            if(mode === 'teams') {
+                sizeContainer.classList.remove('hidden');
+                soloInputs.classList.add('hidden');
+                dynamicInputs.classList.remove('hidden');
+                buildTeamInputs();
+            } else {
+                sizeContainer.classList.add('hidden');
+                soloInputs.classList.remove('hidden');
+                dynamicInputs.classList.add('hidden');
+            }
+        }
+
+        function setTeamSize(size) {
+            teamSize = size;
+            for(let i=2; i<=4; i++) {
+                document.getElementById(`btn-ts-${i}`).classList.toggle('option-selected', i === size);
+            }
+            buildTeamInputs();
+        }
+
+        function buildTeamInputs() {
+            const container = document.getElementById('teams-dynamic-inputs');
+            container.innerHTML = `
+                <div>
+                    <label class="block text-xs font-semibold text-cyan-400 mb-1">اسم الفريق الأول:</label>
+                    <input type="text" id="t1-main-name" value="فريق الصقور" class="w-full bg-slate-900 border border-cyan-500/50 rounded-xl p-2.5 text-sm text-white mb-2">
+                    <div id="t1-players-list" class="grid grid-cols-2 gap-2"></div>
+                </div>
+                <div class="border-t border-slate-700 pt-2">
+                    <label class="block text-xs font-semibold text-pink-400 mb-1">اسم الفريق الثاني:</label>
+                    <input type="text" id="t2-main-name" value="فريق النمور" class="w-full bg-slate-900 border border-pink-500/50 rounded-xl p-2.5 text-sm text-white mb-2">
+                    <div id="t2-players-list" class="grid grid-cols-2 gap-2"></div>
+                </div>
+            `;
+
+            const defaultNames1 = ["أحمد", "حسن", "محمد", "يوسف"];
+            const defaultNames2 = ["علي", "مصطفى", "حسين", "كرار"];
+
+            const pList1 = document.getElementById('t1-players-list');
+            const pList2 = document.getElementById('t2-players-list');
+
+            for(let i=0; i<teamSize; i++) {
+                pList1.innerHTML += `<input type="text" id="t1-p-${i}" value="${defaultNames1[i]}" placeholder="لاعب ${i+1}" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">`;
+                pList2.innerHTML += `<input type="text" id="t2-p-${i}" value="${defaultNames2[i]}" placeholder="لاعب ${i+1}" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">`;
+            }
+        }
+
+        function setRange(type) {
+            rangeType = type;
+            for(let i=1; i<=3; i++) {
+                document.getElementById(`btn-range-${i}`).classList.toggle('option-selected', i === type);
+            }
+        }
+
+        function startGame() {
+            let pts = parseInt(document.getElementById('target-points').value);
+            targetPoints = isNaN(pts) || pts < 1 ? 5 : pts;
+
+            score1 = 0;
+            score2 = 0;
+            currentTeamTurn = 1;
+            pIndex1 = 0;
+            pIndex2 = 0;
+
+            if(gameMode === 'teams') {
+                team1Name = document.getElementById('t1-main-name').value || "فريق الصقور";
+                team2Name = document.getElementById('t2-main-name').value || "فريق النمور";
+                team1Players = [];
+                team2Players = [];
+                for(let i=0; i<teamSize; i++) {
+                    team1Players.push(document.getElementById(`t1-p-${i}`).value || `لاعب ${i+1}`);
+                    team2Players.push(document.getElementById(`t2-p-${i}`).value || `لاعب ${i+1}`);
+                }
+            } else {
+                team1Name = document.getElementById('p1-name').value || "اللاعب الأول";
+                team2Name = document.getElementById('p2-name').value || "اللاعب الثاني";
+                team1Players = [team1Name];
+                team2Players = [team2Name];
+            }
+
+            document.getElementById('display-team1').innerText = team1Name;
+            document.getElementById('display-team2').innerText = team2Name;
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('draw-btn').classList.remove('hidden');
+
+            document.getElementById('fireworks-container').classList.add('hidden');
+            document.getElementById('fireworks-container').innerHTML = '';
+            document.getElementById('lightning-container').classList.add('hidden');
+
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('score-1').innerText = score1.toFixed(1);
+            document.getElementById('score-2').innerText = score2.toFixed(1);
+            document.getElementById('target-goal-text').innerText = `هدف الفوز: ${targetPoints} نقاط`;
+
+            // تحديث قائمة التدرج الجانبية للاعبين وأدوارهم
+            let roster1Html = "";
+            team1Players.forEach((p, idx) => {
+                let activeStyle = (currentTeamTurn === 1 && pIndex1 === idx) ? "font-black text-emerald-300 underline bg-slate-900/60 p-1 rounded" : "opacity-75";
+                roster1Html += `<div class="${activeStyle}">👤 ${p} ${idx === pIndex1 && currentTeamTurn === 1 ? '◄' : ''}</div>`;
+            });
+            document.getElementById('roster-1').innerHTML = roster1Html;
+
+            let roster2Html = "";
+            team2Players.forEach((p, idx) => {
+                let activeStyle = (currentTeamTurn === 2 && pIndex2 === idx) ? "font-black text-emerald-300 underline bg-slate-900/60 p-1 rounded" : "opacity-75";
+                roster2Html += `<div class="${activeStyle}">👤 ${p} ${idx === pIndex2 && currentTeamTurn === 2 ? '◄' : ''}</div>`;
+            });
+            document.getElementById('roster-2').innerHTML = roster2Html;
+
+            let activeTeamText = currentTeamTurn === 1 ? team1Name : team2Name;
+            let activePlayerName = currentTeamTurn === 1 ? team1Players[pIndex1] : team2Players[pIndex2];
+
+            document.getElementById('current-team-turn').innerText = `دور: ${activeTeamText}`;
+            document.getElementById('current-player-name').innerText = activePlayerName;
+
+            if(currentTeamTurn === 1) {
+                document.getElementById('box-1').style.borderColor = '#06b6d4';
+                document.getElementById('box-2').style.borderColor = 'rgba(236, 72, 153, 0.4)';
+            } else {
+                document.getElementById('box-2').style.borderColor = '#ec4899';
+                document.getElementById('box-1').style.borderColor = 'rgba(6, 182, 212, 0.4)';
+            }
+        }
+
+        function drawNumber() {
+            let numBox = document.getElementById('number-display');
+            let numText = document.getElementById('rolled-number');
+            let badge = document.getElementById('badge-status');
+
+            numBox.classList.remove('lucky-seven');
+            badge.classList.add('hidden');
+            numText.innerText = "✨";
+
+            let counter = 0;
+            let interval = setInterval(() => {
+                let tempMin = rangeType === 1 ? 1 : (rangeType === 2 ? 10 : 100);
+                let tempMax = rangeType === 1 ? 9 : (rangeType === 2 ? 99 : 999);
+                numText.innerText = Math.floor(Math.random() * (tempMax - tempMin + 1)) + tempMin;
+                counter++;
+                if(counter > 8) {
+                    clearInterval(interval);
+                    finalizeDraw();
+                }
+            }, 60);
+        }
+
+        function finalizeDraw() {
+            let min = 1, max = 9;
+            if(rangeType === 2) { min = 10; max = 99; }
+            else if(rangeType === 3) { min = 100; max = 999; }
+
+            let val = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById('rolled-number').innerText = val;
+
+            evaluateScore(val);
+        }
+
+        function evaluateScore(val) {
+            let numBox = document.getElementById('number-display');
+            let badge = document.getElementById('badge-status');
+            let msg = document.getElementById('action-message');
+            let strVal = val.toString();
+
+            let earned = 0;
+            let statusText = "";
+            let activePlayer = currentTeamTurn === 1 ? team1Players[pIndex1] : team2Players[pIndex2];
+
+            if(val === 0) {
+                earned = -1;
+                statusText = `صفر خسارة لـ ${activePlayer}! ❌`;
+                numBox.style.borderColor = "#ef4444";
+            }
+            else if(strVal === '77' || strVal === '777' || strVal === '56' || strVal === '7777') {
+                earned = 1;
+                statusText = `إنجاز رائع من ${activePlayer} (+1 نقطة)! 🌟`;
+                numBox.classList.add('lucky-seven');
+                badge.className = "absolute -top-3 px-3 py-0.5 rounded-full text-[10px] font-bold shadow-md bg-emerald-500 text-slate-950";
+                badge.innerText = "رقم محظوظ (1+ نقطة)";
+                badge.classList.remove('hidden');
+            }
+            else if(strVal.includes('7')) {
+                earned = 0.5;
+                statusText = `يحتوي على 7 لـ ${activePlayer} (نصف نقطة)! ✨`;
+                numBox.style.borderColor = "#38bdf8";
+                badge.className = "absolute -top-3 px-3 py-0.5 rounded-full text-[10px] font-bold shadow-md bg-sky-500 text-slate-950";
+                badge.innerText = "نصف نقطة (0.5)";
+                badge.classList.remove('hidden');
+            }
+            else {
+                earned = 0;
+                statusText = `رقم عادي لـ ${activePlayer}، لا تغيير بالنقاط.`;
+                numBox.style.borderColor = "#64748b";
+            }
+
+            if(currentTeamTurn === 1) {
+                if(earned === -1) { score2 += 1; score1 = Math.max(0, score1 - 1); }
+                else { score1 += earned; }
+                // تحريك الدور للاعب التالي في الفريق الأول
+                pIndex1 = (pIndex1 + 1) % team1Players.length;
+            } else {
+                if(earned === -1) { score1 += 1; score2 = Math.max(0, score2 - 1); }
+                else { score2 += earned; }
+                // تحريك الدور للاعب التالي في الفريق الثاني
+                pIndex2 = (pIndex2 + 1) % team2Players.length;
+            }
+
+            msg.innerHTML = `<span class="text-sm font-bold text-teal-300 animate-pulse">النتيجة: ${val} ⟵ ${statusText}</span>`;
+
+            // تبديل الدور بين الفريقين بعد كل رمية
+            currentTeamTurn = currentTeamTurn === 1 ? 2 : 1;
+            updateUI();
+
+            if(score1 >= targetPoints || score2 >= targetPoints) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('draw-btn').classList.add('hidden');
+            let winnerText = "";
+
+            if(score1 > score2) {
+                winnerText = `🏆 الفائز في معركة السبعات هو: ${team1Name} برصيد ${score1} نقطة!`;
+            } else if(score2 > score1) {
+                winnerText = `🏆 الفائز في معركة السبعات هو: ${team2Name} برصيد ${score2} نقطة!`;
+            } else {
+                winnerText = `🤝 تعادل الفريقان برصيد ${score1} نقطة!`;
+            }
+
+            document.getElementById('action-message').innerHTML = `<span class="text-base text-emerald-400 font-extrabold animate-bounce">${winnerText}</span>`;
+
+            launchInteractiveCelebration();
+        }
+
+        function launchInteractiveCelebration() {
+            const lightning = document.getElementById('lightning-container');
+            lightning.classList.remove('hidden');
+
+            const container = document.getElementById('fireworks-container');
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            const celebrationElements = ['⚡', '🔥', '💥', '🎈', '🎉', '🌹', '🌸', '✨', '🎆', '🎇', '🌺'];
+
+            for(let i = 0; i < 50; i++) {
+                let span = document.createElement('div');
+                span.className = 'celebrate-particle';
+                span.innerText = celebrationElements[Math.floor(Math.random() * celebrationElements.length)];
+                span.style.left = Math.random() * 100 + '%';
+                span.style.bottom = '-30px';
+                span.style.animationDuration = (Math.random() * 1.6 + 1.0) + 's';
+                span.style.animationDelay = (Math.random() * 0.8) + 's';
+                container.appendChild(span);
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('draw-btn').classList.remove('hidden');
+            document.getElementById('action-message').innerText = "اضغط على زر السحب لاختبار حظ اللاعب الحالي!";
+            document.getElementById('fireworks-container').classList.add('hidden');
+            document.getElementById('fireworks-container').innerHTML = '';
+            document.getElementById('lightning-container').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

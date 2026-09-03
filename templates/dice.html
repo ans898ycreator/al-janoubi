@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نرد الحظ - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            background-image: linear-gradient(rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* تصميم مكعب النرد الاحترافي ثلاثي الأبعاد */
+        .dice-3d {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 4px 6px rgba(255, 255, 255, 0.8), inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            font-weight: 900;
+            color: #dc2626; /* أرقام باللون الأحمر الواضح */
+            border: 2px solid #cbd5e1;
+            transition: transform 0.1s ease;
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1) translateY(0); }
+            25% { transform: rotate(180deg) scale(1.25) translateY(-15px); }
+            50% { transform: rotate(360deg) scale(0.9) translateY(15px); }
+            75% { transform: rotate(540deg) scale(1.15) translateY(-10px); }
+            100% { transform: rotate(720deg) scale(1) translateY(0); }
+        }
+        .rolling { animation: roll 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+
+        .option-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-selected {
+            border-color: #14b8a6 !important;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(6, 182, 212, 0.1)) !important;
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+            transform: scale(1.02);
+        }
+
+        /* تأثيرات الاحتفال والبالونات */
+        @keyframes celebrate {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-300px) scale(1.2); opacity: 0; }
+        }
+        .celebrate-particle {
+            position: absolute;
+            animation: celebrate 2s ease-in-out infinite;
+            font-size: 28px;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 relative">
+
+    <!-- حاوية الاحتفال (مخفية حتى نهاية اللعبة) -->
+    <div id="fireworks-container" class="absolute inset-0 pointer-events-none overflow-hidden hidden"></div>
+
+    <div class="bg-slate-900/95 border border-teal-500/40 rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl backdrop-blur-md relative z-10">
+
+        <!-- العنوان -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-extrabold text-teal-400 tracking-wide">🎲 لعبة نرد الحظ 🎲</h1>
+            <p class="text-slate-400 text-xs mt-1">خصص إعداداتك وانطلق في التحدي الفوري!</p>
+        </div>
+
+        <!-- 1. شاشة الإعدادات -->
+        <div id="setup-screen" class="space-y-4">
+            <!-- اختيار عدد النرد -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">اختر عدد النرد:</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="setDiceCount(1)" id="btn-dice-1" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2 option-selected">
+                        <span>نرد واحد</span>
+                        <span class="text-lg">🎲</span>
+                    </button>
+                    <button type="button" onclick="setDiceCount(2)" id="btn-dice-2" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2">
+                        <span>نردين</span>
+                        <span class="text-lg">🎲🎲</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- اختيار نمط اللعب -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">نمط اللعب:</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="setMode('solo')" id="btn-mode-solo" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2 option-selected">
+                        <span>فردي</span>
+                        <span class="text-lg">👤</span>
+                    </button>
+                    <button type="button" onclick="setMode('teams')" id="btn-mode-teams" class="option-btn p-3.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 font-bold text-sm flex items-center justify-center gap-2">
+                        <span>فرق (شخصين)</span>
+                        <span class="text-lg">👥</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- إدخال أسماء الفرق -->
+            <div id="teams-inputs" class="space-y-3 hidden bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <div>
+                    <label class="block text-xs font-semibold text-cyan-400 mb-1">اسم الفريق الأول (الازرق):</label>
+                    <input type="text" id="team1-name" value="فريق الصقور" class="w-full bg-slate-900 border border-cyan-500/50 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-pink-400 mb-1">اسم الفريق الثاني (الوردي):</label>
+                    <input type="text" id="team2-name" value="فريق الأسود" class="w-full bg-slate-900 border border-pink-500/50 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-pink-400">
+                </div>
+            </div>
+
+            <!-- إدخال عدد الجولات المفتوح -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-300 mb-1.5">عدد الجولات المطلوبة:</label>
+                <input type="number" id="rounds-input" value="5" min="1" max="100" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-teal-500 text-center font-bold">
+            </div>
+
+            <!-- زر البدء -->
+            <button onclick="startGame()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-base mt-2">
+                بدء اللعبة 🚀
+            </button>
+        </div>
+
+        <!-- 2. شاشة اللعب -->
+        <div id="game-screen" class="hidden space-y-5 text-center">
+            <div class="flex justify-between items-center bg-slate-800/80 p-3 rounded-xl border border-slate-700 text-xs">
+                <span id="current-round-text" class="font-bold text-amber-400">الجولة: 1 / 5</span>
+                <span id="turn-indicator" class="font-bold text-teal-300">دور: اللاعب الأول</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div id="score-box-1" class="bg-cyan-950/40 border border-cyan-500/40 p-3 rounded-xl text-center transition-all duration-300">
+                    <div id="display-name-1" class="text-xs font-bold text-cyan-400">اللاعب 1</div>
+                    <div id="score-1" class="text-2xl font-extrabold text-white mt-1">0</div>
+                </div>
+                <div id="score-box-2" class="bg-pink-950/40 border border-pink-500/40 p-3 rounded-xl text-center transition-all duration-300">
+                    <div id="display-name-2" class="text-xs font-bold text-pink-400">اللاعب 2</div>
+                    <div id="score-2" class="text-2xl font-extrabold text-white mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- النرد ثلاثي الأبعاد الاحترافي بأرقام واضحة حمراء -->
+            <div class="flex justify-center items-center gap-6 my-6">
+                <div id="dice-1" class="dice-3d">1</div>
+                <div id="dice-2" class="dice-3d hidden">2</div>
+            </div>
+
+            <div id="result-message" class="text-sm font-bold text-amber-300 min-h-[30px]">
+                اضغط على الزر الأخضر لفرز النرد!
+            </div>
+
+            <button id="roll-btn" onclick="rollDice()" class="w-full bg-green-600 hover:bg-green-500 text-white font-extrabold p-4 rounded-2xl transition shadow-xl shadow-green-600/40 text-base flex items-center justify-center gap-2">
+                <span>🎲 فرز النرد الآن</span>
+            </button>
+
+            <button onclick="resetGame()" class="text-xs text-slate-400 hover:text-red-400 transition underline mt-2 block mx-auto">
+                إعادة ضبط الإعدادات
+            </button>
+        </div>
+
+        <div class="mt-6 pt-3 border-t border-slate-800 text-center">
+            <a href="{{ url_for('home') }}" class="text-xs text-slate-400 hover:text-teal-400 transition">
+                ← العودة للقائمة الرئيسية
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        let diceCount = 1;
+        let gameMode = 'solo';
+        let totalRounds = 5;
+        let currentRound = 1;
+        let currentTurn = 1;
+        let score1 = 0;
+        let score2 = 0;
+
+        function setDiceCount(count) {
+            diceCount = count;
+            document.getElementById('btn-dice-1').classList.toggle('option-selected', count === 1);
+            document.getElementById('btn-dice-2').classList.toggle('option-selected', count === 2);
+
+            if(count === 2) {
+                document.getElementById('dice-2').classList.remove('hidden');
+            } else {
+                document.getElementById('dice-2').classList.add('hidden');
+            }
+        }
+
+        function setMode(mode) {
+            gameMode = mode;
+            document.getElementById('btn-mode-solo').classList.toggle('option-selected', mode === 'solo');
+            document.getElementById('btn-mode-teams').classList.toggle('option-selected', mode === 'teams');
+
+            if(mode === 'teams') {
+                document.getElementById('teams-inputs').classList.remove('hidden');
+            } else {
+                document.getElementById('teams-inputs').classList.add('hidden');
+            }
+        }
+
+        function startGame() {
+            let inputRounds = parseInt(document.getElementById('rounds-input').value);
+            totalRounds = isNaN(inputRounds) || inputRounds < 1 ? 5 : inputRounds;
+
+            score1 = 0;
+            score2 = 0;
+            currentRound = 1;
+            currentTurn = 1;
+
+            let name1 = gameMode === 'teams' ? document.getElementById('team1-name').value : 'اللاعب الأول';
+            let name2 = gameMode === 'teams' ? document.getElementById('team2-name').value : 'اللاعب الثاني';
+
+            document.getElementById('display-name-1').innerText = name1;
+            document.getElementById('display-name-2').innerText = name2;
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('roll-btn').classList.remove('hidden');
+            document.getElementById('fireworks-container').classList.add('hidden');
+            document.getElementById('fireworks-container').innerHTML = '';
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('score-1').innerText = score1;
+            document.getElementById('score-2').innerText = score2;
+            document.getElementById('current-round-text').innerText = `الجولة: ${currentRound} / ${totalRounds}`;
+
+            let n1 = document.getElementById('display-name-1').innerText;
+            let n2 = document.getElementById('display-name-2').innerText;
+            document.getElementById('turn-indicator').innerText = `دور: ${currentTurn === 1 ? n1 : n2}`;
+
+            if(currentTurn === 1) {
+                document.getElementById('score-box-1').style.borderColor = '#06b6d4';
+                document.getElementById('score-box-2').style.borderColor = 'rgba(236, 72, 153, 0.4)';
+            } else {
+                document.getElementById('score-box-2').style.borderColor = '#ec4899';
+                document.getElementById('score-box-1').style.borderColor = 'rgba(6, 182, 212, 0.4)';
+            }
+        }
+
+        function rollDice() {
+            let d1Elem = document.getElementById('dice-1');
+            let d2Elem = document.getElementById('dice-2');
+
+            d1Elem.classList.add('rolling');
+            if(diceCount === 2) d2Elem.classList.add('rolling');
+
+            setTimeout(() => {
+                d1Elem.classList.remove('rolling');
+                if(diceCount === 2) d2Elem.classList.remove('rolling');
+
+                let val1 = Math.floor(Math.random() * 6) + 1;
+                let val2 = Math.floor(Math.random() * 6) + 1;
+
+                d1Elem.innerText = val1;
+                let roundScore = val1;
+
+                if(diceCount === 2) {
+                    d2Elem.innerText = val2;
+                    roundScore += val2;
+                }
+
+                if(currentTurn === 1) {
+                    score1 += roundScore;
+                    currentTurn = 2;
+                } else {
+                    score2 += roundScore;
+                    currentTurn = 1;
+                    currentRound++;
+                }
+
+                updateUI();
+
+                if(currentRound > totalRounds) {
+                    endGame();
+                }
+            }, 700);
+        }
+
+        function endGame() {
+            document.getElementById('roll-btn').classList.add('hidden');
+            let winnerText = "";
+            let n1 = document.getElementById('display-name-1').innerText;
+            let n2 = document.getElementById('display-name-2').innerText;
+
+            if(score1 > score2) {
+                winnerText = `🏆 الفائز هو: ${n1} بمجموع ${score1} نقطة!`;
+            } else if(score2 > score1) {
+                winnerText = `🏆 الفائز هو: ${n2} بمجموع ${score2} نقطة!`;
+            } else {
+                winnerText = `🤝 تعادل الفريقان برصيد ${score1} نقطة!`;
+            }
+            document.getElementById('result-message').innerHTML = `<span class="text-lg text-teal-400 font-extrabold">${winnerText}</span>`;
+
+            // إطلاق الألعاب النارية والبالونات والشعلات الاحتفالية
+            launchFireworks();
+        }
+
+        function launchFireworks() {
+            const container = document.getElementById('fireworks-container');
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            const icons = ['🎉', '🎈', '🎆', '🎇', '✨', '🎊', '🌟', '💥'];
+            for(let i = 0; i < 35; i++) {
+                let span = document.createElement('div');
+                span.className = 'celebrate-particle';
+                span.innerText = icons[Math.floor(Math.random() * icons.length)];
+                span.style.left = Math.random() * 100 + '%';
+                span.style.bottom = '-20px';
+                span.style.animationDuration = (Math.random() * 1.5 + 1.2) + 's';
+                span.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(span);
+            }
+        }
+
+        function resetGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('roll-btn').classList.remove('hidden');
+            document.getElementById('result-message').innerText = "اضغط على الزر الأخضر لفرز النرد!";
+            document.getElementById('fireworks-container').classList.add('hidden');
+            document.getElementById('fireworks-container').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

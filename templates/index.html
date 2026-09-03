@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالم حمودي الجنوبي - الواجهة الرئيسية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            background-image: linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.9)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .hover-scale { transition: all 0.3s ease; }
+        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl backdrop-blur-md relative z-10 text-center">
+
+        <!-- العنوان والتصميم -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-extrabold text-amber-400 tracking-wide">✨ عالم حمودي الجنوبي ✨</h1>
+            <p class="text-slate-400 text-xs mt-1">اختر القسم الذي تريد الدخول إليه:</p>
+        </div>
+
+        <!-- الأيقونات والأقسام والروابط -->
+        <div class="flex flex-col gap-3">
+
+            <!-- الزر الأول: الأسئلة العامة والمسابقات -->
+            <a href="{{ url_for('ask') }}" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>الأسئلة العامة والمسابقات</span>
+                <span class="text-xl">❓</span>
+            </a>
+
+            <!-- الزر الثاني: ألعاب التركيز والالغاز -->
+            <a href="{{ url_for('games') }}" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>ألعاب التركيز والالغاز</span>
+                <span class="text-xl">🧠</span>
+            </a>
+
+            <!-- الزر الثالث: قسم الأحكام والتحديات -->
+            <a href="{{ url_for('rulings') }}" class="bg-purple-600 hover:bg-purple-500 text-white font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>قسم الأحكام والتحديات</span>
+                <span class="text-xl">🎲</span>
+            </a>
+
+            <!-- الزر الرابع: قسم كرسي الاعتراف -->
+            <a href="{{ url_for('random_section') }}" class="bg-pink-600 hover:bg-pink-500 text-white font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>قسم كرسي الاعتراف</span>
+                <span class="text-xl">🪑</span>
+            </a>
+
+            <!-- الزر الخامس: نرد الحظ -->
+            <a href="{{ url_for('dice_game') }}" class="bg-teal-600 hover:bg-teal-500 text-white font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>نرد الحظ</span>
+                <span class="text-xl">🎯</span>
+            </a>
+
+            <!-- الزر السادس: السبعات 77 -->
+            <a href="{{ url_for('sevens_game') }}" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold p-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-3 text-sm hover-scale">
+                <span>السبعات 77</span>
+                <span class="text-xl">🔥</span>
+            </a>
+
+        </div>
+
+        <!-- لوحة التحكم الخاصة بالمالك والمشرفين -->
+        <div class="mt-5 pt-3 border-t border-slate-800 text-center">
+            <a href="{{ url_for('dashboard') }}" class="text-xs text-slate-400 hover:text-amber-400 transition flex items-center justify-center gap-1">
+                <span>🔒 لوحة التحكم الخاصة بالمالك والمشرفين</span>
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

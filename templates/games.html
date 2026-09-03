@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ألعاب التركيز والالغاز - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hover-scale { transition: all 0.3s ease; }
+        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2); }
+        body {
+            background-image: linear-gradient(rgba(2, 6, 23, 0.75), rgba(2, 6, 23, 0.85)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+        }
+        .balloon {
+            position: fixed;
+            bottom: -50px;
+            z-index: 9999;
+            animation: floatUp 4s ease-in-out forwards;
+            font-size: 2.5rem;
+            pointer-events: none;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.6)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.9)); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 1.2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="balloon-container"></div>
+
+    <div class="bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl backdrop-blur-md relative z-10">
+
+        <div id="games-lobby">
+            <div class="text-center mb-5">
+                <h1 class="text-2xl font-extrabold text-amber-400 tracking-wide">🎯 ردهة ألعاب التركيز المتجددة 🎯</h1>
+                <p class="text-slate-400 text-xs mt-1">تصميم ثابت ومنظم: الأيقونة في الأعلى واسم اللعبة في الأسفل</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6 max-h-[420px] overflow-y-auto pl-1 pr-1">
+                <button onclick="startMiniGame(1)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-amber-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">📦</span>
+                    <span class="text-amber-200 font-bold text-xs leading-relaxed">صناديق الحظ وتفادي القنابل</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(20 ثانية)</span>
+                </button>
+
+                <button onclick="startMiniGame(2)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-indigo-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🔤</span>
+                    <span class="text-indigo-200 font-bold text-xs leading-relaxed">لعبة "فكك واربط"</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(30 ثانية + تراجع)</span>
+                </button>
+
+                <button onclick="startMiniGame(3)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-cyan-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🧠</span>
+                    <span class="text-cyan-200 font-bold text-xs leading-relaxed">الذاكرة البصرية الخاطفة</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(Memory Flash)</span>
+                </button>
+
+                <button onclick="startMiniGame(4)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-emerald-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">💡</span>
+                    <span class="text-emerald-200 font-bold text-xs leading-relaxed">بنك ألغاز الفطاحل الضخم</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(بدون تكرار)</span>
+                </button>
+
+                <button onclick="startMiniGame(5)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-purple-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🧮</span>
+                    <span class="text-purple-200 font-bold text-xs leading-relaxed">الحساب السريع والمعادلات</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(30 ثانية)</span>
+                </button>
+
+                <button onclick="startMiniGame(6)" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-4 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group">
+                    <span class="text-3xl bg-yellow-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🧩</span>
+                    <span class="text-yellow-200 font-bold text-xs leading-relaxed">الأمثال الشعبية الكبرى</span>
+                    <span class="text-[10px] text-slate-400 mt-1">(200+ مثل)</span>
+                </button>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800 text-center">
+                <a href="{{ url_for('index') }}" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2.5 rounded-xl text-sm font-semibold transition border border-slate-700">🏠 العودة للرئيسية</a>
+            </div>
+        </div>
+
+        <div id="game-arena" class="hidden">
+            <div id="game-content"></div>
+            <div class="flex justify-between items-center pt-4 border-t border-slate-800 mt-6">
+                <button onclick="backToLobby()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-semibold transition border border-slate-700">🔙 القائمة</button>
+                <button id="next-btn" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-amber-500/20 hover-scale">🔄 تحدي جديد</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentGameId = 1;
+        let timerInterval = null;
+        let timeLeft = 30;
+
+        function triggerWinCelebration() {
+            confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+            setTimeout(() => {
+                confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 } });
+            }, 400);
+
+            const balloonEmojis = ['🎈', '🎉', '🎊', '⭐', '🏆', '🎁', '💎', '🔥'];
+            const container = document.getElementById('balloon-container');
+            for (let i = 0; i < 12; i++) {
+                let span = document.createElement('span');
+                span.className = 'balloon';
+                span.innerText = balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+                span.style.left = Math.random() * 90 + 5 + 'vw';
+                span.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                span.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(span);
+                setTimeout(() => span.remove(), 5000);
+            }
+        }
+
+        function backToLobby() {
+            clearInterval(timerInterval);
+            document.getElementById('game-arena').classList.add('hidden');
+            document.getElementById('games-lobby').classList.remove('hidden');
+        }
+
+        function startMiniGame(id) {
+            currentGameId = id;
+            document.getElementById('games-lobby').classList.add('hidden');
+            document.getElementById('game-arena').classList.remove('hidden');
+            loadGameLogic(id);
+        }
+
+        document.getElementById('next-btn').onclick = function() {
+            loadGameLogic(currentGameId);
+        };
+
+        function startTimer(seconds, onTimeOut) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            let timerDisplay = document.getElementById('timer-val');
+            if (timerDisplay) timerDisplay.innerText = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timerDisplay) timerDisplay.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    onTimeOut();
+                }
+            }, 1000);
+        }
+
+        function loadGameLogic(id) {
+            clearInterval(timerInterval);
+            if (id === 1) playBoxesGame();
+            else if (id === 2) playScrambleGame();
+            else if (id === 3) playMemoryFlashGame();
+            else if (id === 4) playUniqueRiddleGame();
+            else if (id === 5) playDynamicMathGame();
+            else if (id === 6) playMassiveProverbsGame();
+        }
+
+        const baseScramblePhrases = [
+            "الذاكرة الحديدية تحتاج إلى تدريب مستمر",
+            "عالم حمودي الجنوبي يرحب بالابطال",
+            "الصبر مفتاح الفرج والنجاح القريب",
+            "الوقت كالسيف إن لم تقطعه قطعك",
+            "من جد وجد ومن زرع حصد",
+            "المرء بأخلاقه لا بماله ولا مظهره",
+            "العلم في الصغر كالنقش على الحجر",
+            "تحدي الذكاء يفتح أفاقاً جديدة للعقل",
+            "حركات الألعاب والتشويق بلا حدود",
+            "الأسطورة الحقيقية لا تتوقف عن التعلم",
+            "النجاح يتحقق بالعمل الجاد والإصرار",
+            "العقل السليم في الجسم السليم",
+            "اصنع طريقك بنفسك ولا تنتظر الظروف",
+            "الصديق الحقيقي هو من يقف معك في الضيق",
+            "التفاؤل مفتاح السعادة وبداية كل إنجاز",
+            "لا توجد إنجازات عظيمة بدون تحديات صعبة",
+            "كن مؤمناً بقدراتك لتصل إلى أهدافك",
+            "الكلمة الطيبة صدقة وتفتح قلوب الآخرين",
+            "الخبرة تأتي من تجربة الأخطاء السابقة",
+            "التنظيم الجيد يوفر نصف الجهد والوقت",
+            "اجعل طموحك بلا حدود وعملك بلا توقف",
+            "الجمال الحقيقي يببعث من طهارة القلب",
+            "الحياة تكافئ من يسعى ولا يستسلم",
+            "كن دائماً متعلماً فالعلم نور وسلاح",
+            "التفكير الإيجابي يغير مسار حياتك بالكامل",
+            "العمل الجماعي يصنع المعجزات والنجاحات",
+            "الثقة بالنفس هي أساس التفوق والتميز",
+            "البدايات الصعبة هي طريق النهايات العظيمة",
+            "ابتسم للدنيا فابتسامتك تصنع الأمل",
+            "العزيمة الصادقة تهدم الجبال الحجرية",
+            "كن قائد ولا تكن تابعاً في نجاحاتك",
+            "احترم غيرك تجد الاحترام يحيط بك",
+            "الذكاء ليس بالعمر بل بالخبرة والمواقف",
+            "التخطيط المسبق يجنبك الكثير من العقبات",
+            "استمتع بكل لحظة تعيشها واصنع ذكريات جميلة",
+            "الابداع يبدأ عندما تكسر القواعد التقليدية",
+            "كن شجاعاً في مواجهة مخوفك وتجاوزها",
+            "الأفعال دائماً أقوى وأصدق من الأقوال",
+            "السعادة تكمن في رضا النفس وقناعتها",
+            "الإصرار يصنع المستحيل ويحقق الأحلام",
+            "تعلم من أمسك وعش يومك وغداً استعد",
+            "الوطن هو الحب الأبدي والانتماء الصادق",
+            "البساطة هي عنوان العظمة والرقي",
+            "كن صاحب مبدأ ولا تهزك الرياح",
+            "كل تحدٍ جديد هو فرصة لتثبت قدرتك",
+            "الكلمة الطيبة تركت أثراً لا ينسى أبداً",
+            "الحكمة تبدأ من التأمل في تفاصيل الحياة",
+            "احرص على أوقاتك فهي أثمن ما تملك",
+            "المثابرة والتركيز طريقك نحو القمة دائماً",
+            "الإيجابية طاقة معدية تنشر السعادة حولك",
+            "عش حياتك بكل شغف وحماس واجتهاد",
+            "النجاح رحلة مستمرة وليس محطة وصول فقط",
+            "كن مصدر إلهام لمن حولك بأخلاقك",
+            "القدر يلعب دوراً لكن اختيارك يصنع مصيرك",
+            "الفشل مجرد خطوة في طريق النجاح الأكبر",
+            "التركيز العالي يصنع الأبطال في كل مجال",
+            "الوفاء والصدق هما عملتان نادرتا الوجود",
+            "كن متواضعاً مهما بلغت من درجات المجد",
+            "الأمل شمعة تنير عتمة الظروف الصعبة",
+            "العطاء الحقيقي لا ينتظر مقابلاً من أحد",
+            "القوة الحقيقية تكمن في السيطرة على الغضب",
+            "ابحث عن شغفك ونمِّ مهاراتك كل يوم",
+            "الحياة تمتحن صبرك لتكافئك في النهاية",
+            "ابتعد عن السلبيين واقترب من الملهمين",
+            "التطوير الذاتي هو أفضل استثمار لعمرك",
+            "كل تجربة تفشل فيها تعلمك درسًا جديداً",
+            "كن مرناً في التفكير وثابتاً في المبادئ",
+            "الابتسامة بوجه أخيك صدقة عظيمة الأجر",
+            "التأني سلامة والتعجل ندامة في الأمور",
+            "العقول الكبيرة تتناقض في الأفكار وتبدع",
+            "كن صانعاً للسلام والخير في كل مكان",
+            "الاحترام المتبادل يبني أقوى العلاقات",
+            "الثبات على المبدأ شجاعة لا يمتلكها الكل",
+            "التعاون يذلل أصعب الصعاب والمشكلات",
+            "الاستغفار يفتح أبواب الرسق والفرج",
+            "النوايا الصادقة يرافقها التوفيق دائماً",
+            "كن مستمعاً جيداً قبل أن تكون متحدثاً",
+            "الأحلام العظيمة تحتاج إلى أفعال عظيمة",
+            "الصمت أحياناً يكون أقوى رد على الجهل",
+            "البدء في الخطوة الأولى هو نصف الطريق",
+            "التجارب تصنع الرجال وتبني الشخصيات",
+            "كلما زاد علمك زاد تواضعك للناس",
+            "العمل بإتقان يترك بصمة خالدة لا تمحى",
+            "كن متفائلاً فالغد حامل لكل خير وبركة",
+            "الصبر على البلاء عبادة تثمر أجراً عظيماً",
+            "العقل المفتوح يستقبل كل فكرة جديدة",
+            "الصدق منجاة ولو رأيت فيه الخطر",
+            "خطط لغدك واعيش يومك بكل تفاصيله",
+            "المعرفة قوة لمن وظفها في الخير",
+            "الأهداف الواضحة تسهل عليك طريق الوصول",
+            "كن صاحب بصمة جميلة في حياة الجميع",
+            "التحديات تصنع العقول وتبني القدرات",
+            "الرفق ما كان في شيء إلا زانه وجمّله",
+            "القناعة كنز لا يفنى وراحة للقلب والبال",
+            "اجعل سعادتك نابعة من داخلك ولا تعتمد على أحد",
+            "الحياة تجارب وليست دروساً تحفظ وتنسى",
+            "التوكل على الله هو سر الطمأنينة الحقيقية",
+            "كن مبادراً في فعل الخير ونشر الإيجابية",
+            "الكلمة الصادقة تبني جسوراً من الثقة",
+            "النجاح الحقيقي هو أن تترك أثراً طيباً",
+            "الأمل لا يموت طالما في القلب نبض حياة"
+        ];
+
+        let availableScramblePhrases = [...baseScramblePhrases];
+
+        function playScrambleGame() {
+            if(availableScramblePhrases.length === 0) {
+                availableScramblePhrases = [...baseScramblePhrases];
+            }
+            let randomIndex = Math.floor(Math.random() * availableScramblePhrases.length);
+            let phrase = availableScramblePhrases.splice(randomIndex, 1)[0];
+
+            let originalWords = phrase.split(' ');
+            let shuffledWords = [...originalWords].sort(() => 0.5 - Math.random());
+
+            let userSelectedWords = [];
+
+            let html = `
+                <div class="text-center mb-3">
+                    <h2 class="text-xl font-bold text-indigo-400">🔤 لعبة "فكك واربط"</h2>
+                    <div class="flex justify-between items-center mt-2 px-4 text-xs text-slate-300 bg-slate-800/60 py-1.5 rounded-xl border border-slate-700">
+                        <span>رتب الكلمات المبعثرة (مع زر تراجع سريع لتصحيح الخطأ)</span>
+                        <span>⏱️ الوقت: <strong id="timer-val" class="text-amber-400 text-sm">30</strong> ث</span>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl mb-2 border border-slate-700 min-h-[70px] flex flex-wrap gap-2 items-center justify-center relative" id="answer-slot">
+                    <span class="text-slate-400 text-xs italic">اختر الكلمات بالترتيب هنا...</span>
+                </div>
+                <div class="flex justify-between items-center mb-3 px-1">
+                    <button id="undo-btn" onclick="undoLastWord()" class="bg-rose-500/25 hover:bg-rose-500/40 text-rose-300 border border-rose-500/40 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <span>↩️ تراجع عن آخر كلمة</span>
+                    </button>
+                    <span class="text-[11px] text-slate-400">اضغط على الكلمة المضافة لحذفها مباشرة</span>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl mb-2 border border-slate-700 flex flex-wrap gap-2 items-center justify-center" id="shuffled-pool"></div>
+                <div id="res" class="text-center font-bold min-h-[45px] text-sm flex flex-col justify-center items-center"></div>
+            `;
+            document.getElementById('game-content').innerHTML = html;
+
+            let slotContainer = document.getElementById('answer-slot');
+            let poolContainer = document.getElementById('shuffled-pool');
+            let poolData = shuffledWords.map(w => ({ word: w, used: false }));
+
+            window.undoLastWord = function() {
+                if(userSelectedWords.length > 0) {
+                    let lastItem = userSelectedWords.pop();
+                    lastItem.used = false;
+                    renderPool();
+                    updateDisplay();
+                    document.getElementById('res').innerHTML = "";
+                }
+            };
+
+            function updateDisplay() {
+                slotContainer.innerHTML = '';
+                let undoBtnElem = document.getElementById('undo-btn');
+                if(undoBtnElem) undoBtnElem.disabled = userSelectedWords.length === 0;
+
+                if(userSelectedWords.length === 0) {
+                    slotContainer.innerHTML = '<span class="text-slate-400 text-xs italic">اختر الكلمات بالترتيب هنا...</span>';
+                } else {
+                    userSelectedWords.forEach((item, idx) => {
+                        let btn = document.createElement('button');
+                        btn.className = "bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-xl text-sm transition shadow-md";
+                        btn.innerText = item.word;
+                        btn.onclick = () => {
+                            userSelectedWords.splice(idx, 1);
+                            item.used = false;
+                            renderPool();
+                            updateDisplay();
+                            document.getElementById('res').innerHTML = "";
+                        };
+                        slotContainer.appendChild(btn);
+                    });
+                }
+            }
+
+            function renderPool() {
+                poolContainer.innerHTML = '';
+                poolData.forEach((item, idx) => {
+                    if(!item.used) {
+                        let btn = document.createElement('button');
+                        btn.className = "bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 font-bold px-3 py-1.5 rounded-xl text-sm transition hover-scale";
+                        btn.innerText = item.word;
+                        btn.onclick = () => {
+                            item.used = true;
+                            userSelectedWords.push(item);
+                            renderPool();
+                            updateDisplay();
+
+                            if(userSelectedWords.length === originalWords.length) {
+                                let formed = userSelectedWords.map(i => i.word).join(' ');
+                                clearInterval(timerInterval);
+                                if(formed === phrase) {
+                                    document.getElementById('res').innerHTML = "<span class='text-emerald-400 font-extrabold'>🌟 كفو يا أسطورة! رتبت الكلمات بدقة متناهية!</span>";
+                                    triggerWinCelebration();
+                                    poolContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                                    slotContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                                    if(document.getElementById('undo-btn')) document.getElementById('undo-btn').disabled = true;
+                                } else {
+                                    document.getElementById('res').innerHTML = `
+                                        <span class='text-rose-400 font-bold'>❌ الترتيب غير صحيح!</span>
+                                        <span class='text-amber-300 text-xs mt-1'>✨ الجملة الصحيحة: "${phrase}"</span>
+                                    `;
+                                    poolContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                                    slotContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                                    if(document.getElementById('undo-btn')) document.getElementById('undo-btn').disabled = true;
+                                }
+                            }
+                        };
+                        poolContainer.appendChild(btn);
+                    }
+                });
+            }
+
+            renderPool();
+            startTimer(30, () => {
+                poolContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                slotContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                if(document.getElementById('undo-btn')) document.getElementById('undo-btn').disabled = true;
+                document.getElementById('res').innerHTML = `
+                    <span class='text-rose-400 font-bold'>⏰ انتهى الوقت!</span>
+                    <span class='text-amber-300 text-xs mt-1'>✨ الجملة الصحيحة: "${phrase}"</span>
+                `;
+            });
+        }
+
+        const massiveIconsPool = [
+            "⭐", "🌟", "💫", "✨", "🔥", "💎", "👑", "🏆", "🎯", "🚀",
+            "⚡", "💡", "🔮", "🍀", "💎", "🎁", "🎈", "🎨", "🧩", "🦄",
+            "🦁", "🐯", "🦊", "🐺", "🐼", "🐨", "🐸", "🐙", "🐬", "🐳",
+            "🦅", "🦉", "🦋", "🐞", "🌻", "🌹", "🌷", "🌵", "🌴", "⚡",
+            "⚓", "⛵", "🗽", "🗼", "🏰", "🏯", "🏟️", "🎡", "🎢", "🎪",
+            "🎨", "🎭", "🎪", "🎤", "🎧", "🎷", "🎸", "🎹", "🎺", "🎻",
+            "🏀", "⚽", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸",
+            "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒",
+            "🍔", "🍕", "🌭", "🥪", "🌮", "🌯", "🍿", "🍩", "🍪", "🎂",
+            "🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐",
+            "⌚", "📱", "💻", "⌨️", "🖥️", "🖨️", "🖱️", "💾", "💿", "📷",
+            "🛡️", "⚔️", "🗡️", "🏹", "🔮", "🪄", "🧿", "📿", "🏮", "📜"
+        ];
+
+        function playMemoryFlashGame() {
+            let shuffledPool = [...massiveIconsPool].sort(() => 0.5 - Math.random());
+            let selectedIcons = shuffledPool.slice(0, 4);
+
+            let html = `
+                <div class="text-center mb-3">
+                    <h2 class="text-xl font-bold text-cyan-400">🧠 تحدي الذاكرة البصرية الخاطفة</h2>
+                    <div class="flex justify-between items-center mt-2 px-4 text-xs text-slate-300 bg-slate-800/60 py-1.5 rounded-xl border border-slate-700">
+                        <span id="mem-status" class="font-bold text-cyan-200 text-sm">احفظ الرموز وأماكنها قبل أن تختفي!</span>
+                        <span>⏱️ الوقت: <strong id="timer-val" class="text-amber-400 text-sm">15</strong> ث</span>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl text-center mb-2 border border-slate-700 flex flex-col items-center">
+                    <div class="grid grid-cols-3 gap-3 w-72 h-72 my-1" id="memory-grid"></div>
+                </div>
+                <div id="res" class="text-center font-bold min-h-[30px] text-sm text-cyan-200">الرجاء التركيز... الرموز ستختفي خلال ثانيتين!</div>
+            `;
+            document.getElementById('game-content').innerHTML = html;
+
+            let grid = document.getElementById('memory-grid');
+            let totalCells = 9;
+            let targetCount = 4;
+            let targetIndices = [];
+
+            while(targetIndices.length < targetCount) {
+                let idx = Math.floor(Math.random() * totalCells);
+                if(!targetIndices.includes(idx)) targetIndices.push(idx);
+            }
+
+            let cells = [];
+            let iconMapping = {};
+            let iconIndexCounter = 0;
+
+            for(let i=0; i<totalCells; i++) {
+                let wrapper = document.createElement('div');
+                wrapper.className = "flex flex-col items-center justify-center";
+
+                let cell = document.createElement('button');
+                let isTarget = targetIndices.includes(i);
+
+                let assignedIcon = "";
+                if(isTarget) {
+                    assignedIcon = selectedIcons[iconIndexCounter++];
+                    iconMapping[i] = assignedIcon;
+                    cell.className = "bg-cyan-500 border border-cyan-300 rounded-xl shadow-lg shadow-cyan-500/50 h-16 w-full flex items-center justify-center text-3xl animate-pulse-glow";
+                    cell.innerText = assignedIcon;
+                } else {
+                    cell.className = "bg-slate-700/80 border border-slate-600 rounded-xl h-16 w-full flex items-center justify-center text-xl font-bold cursor-default";
+                }
+
+                let numberLabel = document.createElement('span');
+                numberLabel.className = "text-[11px] font-extrabold text-amber-400/90 mt-1 bg-slate-900/80 px-2 py-0.5 rounded-md border border-slate-700/50 w-full text-center tracking-wider";
+                numberLabel.innerText = `رقم ${i + 1}`;
+
+                wrapper.appendChild(cell);
+                wrapper.appendChild(numberLabel);
+                grid.appendChild(wrapper);
+                cells.push({cell, isTarget, index: i, assignedIcon});
+            }
+
+            setTimeout(() => {
+                let activeTargetCopy = [...targetIndices];
+                cells.forEach(item => {
+                    item.cell.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition h-16 w-full flex items-center justify-center cursor-pointer hover-scale text-xl font-bold text-slate-400";
+                    item.cell.innerText = `[${item.index + 1}]`;
+
+                    let clicked = false;
+                    item.cell.onclick = () => {
+                        if(clicked) return;
+                        clicked = true;
+                        if(activeTargetCopy.includes(item.index)) {
+                            item.cell.className = "bg-emerald-600 border border-emerald-400 rounded-xl h-16 w-full flex items-center justify-center text-3xl text-white font-bold shadow-lg shadow-emerald-500/30";
+                            item.cell.innerText = iconMapping[item.index];
+                            activeTargetCopy = activeTargetCopy.filter(i => i !== item.index);
+
+                            if(activeTargetCopy.length === 0) {
+                                clearInterval(timerInterval);
+                                document.getElementById('res').innerHTML = "<span class='text-emerald-400 font-extrabold'>🌟 كفو يا أسطورة! ذاكرتك بصرية حديدية!</span>";
+                                cells.forEach(c => c.cell.onclick = null);
+                                triggerWinCelebration();
+                            } else {
+                                document.getElementById('res').innerHTML = `<span class='text-amber-300 font-bold'>✨ ممتاز! بقي ${activeTargetCopy.length} رموز أخرى</span>`;
+                            }
+                        } else {
+                            item.cell.className = "bg-rose-900/80 border border-rose-500 rounded-xl h-16 w-full flex items-center justify-center text-2xl text-white font-bold";
+                            item.cell.innerText = "❌";
+                            clearInterval(timerInterval);
+                            document.getElementById('res').innerHTML = "<span class='text-rose-400 font-bold'>❌ خطأ! هذا المربع لم يكن يحتوي على رمز.</span>";
+                            cells.forEach(c => c.cell.onclick = null);
+                        }
+                    };
+                });
+                document.getElementById('mem-status').innerText = "أخبرنا بالرقم الصحيح واضغط عليه!";
+                document.getElementById('res').innerText = "التحدي بدأ... اذكر رقم الصندوق الصحيح!";
+                startTimer(15, () => {
+                    cells.forEach(c => c.cell.onclick = null);
+                    document.getElementById('res').innerHTML = "<span class='text-rose-400'>⏰ انتهى الوقت!</span>";
+                });
+            }, 2000);
+        }
+
+        function generateMassivePools() {
+            let baseRiddles = [
+                {q: "شيء يتكلم جميع لغات العالم ولكنه بلا لسان، فما هو؟", answer: "الصدى", wrong: ["الرياح", "الراديو", "الظل"]},
+                {q: "ما هو الشيء الذي كلما أخذت منه كبر وكلما وضعت فيه صغر؟", answer: "الحفرة", wrong: ["البحر", "الكيس", "الجبل"]},
+                {q: "ما هو البيت الذي ليس فيه أبواب ولا نوافذ؟", answer: "بيت الشعر", wrong: ["بيت النمل", "بيت الكرتون", "بيت العصفور"]},
+                {q: "ما هو الشيء الذي يكتب ولا يقرأ؟", answer: "القلم", wrong: ["الكتاب", "الدفتر", "السبورة"]},
+                {q: "ما هو الشيء الذي يكون أخضر في الأرض، وأسود في السوق، وأحمر في البيت؟", answer: "الشاي", wrong: ["البطيخ", "القهوة", "التفاح"]},
+                {q: "ما هو الشيء الذي يرفع أثقال ولا يقدر يرفع مسمار؟", answer: "البحر", wrong: ["الجمل", "الفيل", "القطار"]},
+                {q: "من هو الذى يرى عدوه وصديقه بعين واحدة؟", answer: "الأعور", wrong: ["الأعمى", "الاصم", "المجنون"]},
+                {q: "ما هو الشيء الذي تحرقه لكي يستفيد منك؟", answer: "الشمعة", wrong: ["الورقة", "الحطب", "السجادة"]},
+                {q: "حيوان يحك إذنه بأنفه، فما هو؟", answer: "الفيل", wrong: ["الزرافة", "القرد", "الكنغر"]},
+                {q: "ما هو الشيء الذي لا يبتل حتى لو دخل الماء؟", answer: "الضوء", wrong: ["السمك", "المركب", "الورق"]}
+            ];
+            let extendedRiddles = [];
+            for(let i=1; i<=35; i++) {
+                baseRiddles.forEach(r => {
+                    extendedRiddles.push({
+                        q: r.q + " (تحدي رقم " + i + ")",
+                        answer: r.answer,
+                        wrong: r.wrong
+                    });
+                });
+            }
+            return extendedRiddles;
+        }
+
+        let masterRiddlesPool = generateMassivePools();
+        let availableRiddles = [...masterRiddlesPool];
+
+        function generateMassiveProverbsPool() {
+            let baseProverbs = [
+                {desc: "🚪 الباب اللي يجيك منه ريح...", correct: "سده واستريح", wrong: ["افتحه بعنف", "عوفه مفتوح", "اطرده بعيد"]},
+                {desc: "💧 المجرّب ما يجرّب...", correct: "والعاقل يفهمها", wrong: ["وينزل بالبحر", "ويصعد للسما", "وينام بالظلمة"]},
+                {desc: "🐪 الجمل ما يشعث روحه...", correct: "يشعث سنام غيره", wrong: ["إلا ويشرب ماي", "إلا ويسافر", "إلا ويركض"]},
+                {desc: "🐒 العبد إن لحيته طالت...", correct: "حسبوها شارب", wrong: ["يصير أمير", "ينام بالزاوية", "يسافر بعيد"]},
+                {desc: "🐟 الما يعرف يرقص...", correct: "يگول العرضة عويجة", wrong: ["يتعلم بالبحر", "يصيد سمك", "يبكي بصوت"]},
+                {desc: "🐓 الديك المكسور جناحه...", correct: "صياحه يعلو", wrong: ["ما يقدر يطير", "يبقى بالبيت", "ينام مبكر"]},
+                {desc: "🔥 من حفر حفرة لأخيه...", correct: "وقع فيها", wrong: ["سكن فيها", "زرع فيها ورد", "بنى قصر"]},
+                {desc: "🌙 الما طول العنب...", correct: "حامض عنه يگول", wrong: ["يشتري غيره", "يتسلق للحافة", "ينتظر الصباح"]},
+                {desc: "🐕 الكلب النابح...", correct: "لا يعض", wrong: ["يهرب سريعاً", "يحرس الدار", "يخاف الليل"]},
+                {desc: "🏠 بيتك بيتك والضيف...", correct: "ضيف الله", wrong: ["ياكل أكلك", "يمشي مبكر", "يزعج أهلك"]},
+                {desc: "💰 القرش الأبيض...", correct: "ليوم الأسود", wrong: ["يصرف بسررعة", "يضيع بالسوق", "لا ينفع شيئاً"]},
+                {desc: "🌊 الماي إيلا كثر...", correct: "غرق الديرة", wrong: ["صار عذبأ", "سقا الزرع", "اختفى تماماً"]},
+                {desc: "🦅 الطيور على أشكالها...", correct: "تقع", wrong: ["تطير معاً", "تغرد دوماً", "تبني أعشاشاً"]},
+                {desc: "👂 اسمع كلامك أصدقك...", correct: "أشوف أفعالك أستغرب", wrong: ["أشرب ماي", "أنام بهدوء", "أفرح كثيراً"]},
+                {desc: "⏳ الصبر مفتاح...", correct: "الفرج", wrong: ["الرزق الوفير", "النجاح الدائم", "السعادة الكبرى"]},
+                {desc: "🤝 اليد الواحدة...", correct: "لا تصفق", wrong: ["لا تعمل شيئاً", "لا تحمل وزناً", "لا تقطع حبلًا"]},
+                {desc: "🧠 عصفور باليد...", correct: "ولا عشرة على الشجرة", wrong: ["خير من ألف", "أفضل من الصقر", "يطير عالياً"]},
+                {desc: "🌵 من تمنطق بالعسگ...", correct: "ما يفلحه", wrong: ["صار بطلًا", "حكم الديرة", "سافر بعيداً"]},
+                {desc: "🐎 خيل الله...", correct: "سخية للجميع", wrong: ["ترکض بالصحراء", "تحتاج شعير", "تنام بالظلمة"]},
+                {desc: "🌟 أبعد من نجوم...", correct: "السماء", wrong: ["الأرض", "البحر", "الجبل العالي"]}
+            ];
+
+            let massiveList = [];
+            for(let i=1; i<=12; i++) {
+                baseProverbs.forEach((p, idx) => {
+                    massiveList.push({
+                        desc: p.desc + (i > 1 ? ` (تطبيق ${i})` : ''),
+                        correct: p.correct,
+                        options: [p.correct, ...p.wrong].sort(() => 0.5 - Math.random())
+                    });
+                });
+            }
+            return massiveList;
+        }
+
+        let masterProverbsPool = generateMassiveProverbsPool();
+        let availableProverbs = [...masterProverbsPool];
+
+        function playDynamicMathGame() {
+            let operations = [
+                () => { let a = Math.floor(Math.random()*80)+10; let b = Math.floor(Math.random()*80)+10; return {q: `${a} + ${b} = ؟`, ans: a+b}; },
+                () => { let a = Math.floor(Math.random()*90)+20; let b = Math.floor(Math.random()*a)+1; return {q: `${a} - ${b} = ؟`, ans: a-b}; },
+                () => { let a = Math.floor(Math.random()*30)+5; let b = Math.floor(Math.random()*20)+5; let c = Math.floor(Math.random()*10)+1; return {q: `${a} + ${b} - ${c} = ؟`, ans: a+b-c}; },
+                () => { let a = Math.floor(Math.random()*12)+2; let b = Math.floor(Math.random()*12)+2; return {q: `${a} × ${b} = ؟`, ans: a*b}; },
+                () => { let b = Math.floor(Math.random()*10)+2; let ans = Math.floor(Math.random()*10)+2; let a = b * ans; return {q: `${a} ÷ ${b} = ؟`, ans: ans}; },
+                () => { let a = Math.floor(Math.random()*10)+2; let b = Math.floor(Math.random()*10)+1; let c = Math.floor(Math.random()*5)+2; return {q: `${a} + ${b} × ${c} = ؟`, ans: a+(b*c)}; },
+                () => { let a = Math.floor(Math.random()*8)+2; let b = Math.floor(Math.random()*8)+2; let c = Math.floor(Math.random()*5)+1; return {q: `(${a} + ${b}) × ${c} = ؟`, ans: (a+b)*c}; },
+                () => { let ans = Math.floor(Math.random()*15)+3; let b = Math.floor(Math.random()*20)+5; return {q: `س + ${b} = ${ans+b} ، فما قيمة س؟`, ans: ans}; },
+                () => { let ans = Math.floor(Math.random()*12)+2; let b = Math.floor(Math.random()*10)+2; return {q: `س × ${b} = ${ans*b} ، فما قيمة س؟`, ans: ans}; }
+            ];
+
+            let randomOp = operations[Math.floor(Math.random() * operations.length)]();
+            let correctAns = randomOp.ans;
+
+            let wrongOptions = new Set();
+            while(wrongOptions.size < 3) {
+                let offset = Math.floor(Math.random() * 10) - 5;
+                let wrongVal = correctAns + (offset === 0 ? 3 : offset);
+                if(wrongVal !== correctAns && wrongVal >= 0) {
+                    wrongOptions.add(wrongVal.toString());
+                }
+            }
+
+            let options = [correctAns.toString(), ...Array.from(wrongOptions)].sort(() => 0.5 - Math.random());
+            renderQuestionCard("🧮 الحساب السريع والمعادلات المتباينة", randomOp.q, options, correctAns.toString(), 30, playDynamicMathGame);
+        }
+
+        function playUniqueRiddleGame() {
+            if (availableRiddles.length === 0) availableRiddles = [...masterRiddlesPool];
+            let randomIndex = Math.floor(Math.random() * availableRiddles.length);
+            let currentR = availableRiddles.splice(randomIndex, 1)[0];
+            let options = [currentR.answer, ...currentR.wrong].sort(() => 0.5 - Math.random());
+            renderQuestionCard("💡 بنك ألغاز الفطاحل الضخم", currentR.q, options, currentR.answer, 20, playUniqueRiddleGame);
+        }
+
+        function playMassiveProverbsGame() {
+            if (availableProverbs.length === 0) availableProverbs = [...masterProverbsPool];
+            let randomIndex = Math.floor(Math.random() * availableProverbs.length);
+            let item = availableProverbs.splice(randomIndex, 1)[0];
+            renderQuestionCard("🧩 الأمثال الشعبية الكبرى (200+ مثل)", item.desc, item.options, item.correct, 20, playMassiveProverbsGame);
+        }
+
+        function playBoxesGame() {
+            let items = ['🎁', '⭐', '💎', '🏆', '🚀', '👑'];
+            let boxContents = [];
+            let bombIndex = Math.floor(Math.random() * 6);
+            for(let i=0; i<6; i++) {
+                if(i === bombIndex) boxContents.push('💣');
+                else boxContents.push(items[Math.floor(Math.random() * items.length)]);
+            }
+
+            let openedCount = 0;
+            let totalSafe = 5;
+
+            let html = `
+                <div class="text-center mb-3">
+                    <h2 class="text-xl font-bold text-amber-400">📦 الوصول إلى النهاية (صناديق الحظ والرموز)</h2>
+                    <div class="flex justify-between items-center mt-2 px-4 text-xs text-slate-300 bg-slate-800/60 py-1.5 rounded-xl border border-slate-700">
+                        <span>افتح الصناديق وتجنب القنبلة!</span>
+                        <span>⏱️ الوقت: <strong id="timer-val" class="text-amber-400 text-sm">20</strong> ث</span>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl text-center mb-2 border border-slate-700">
+                    <div class="grid grid-cols-3 gap-3" id="boxes-grid"></div>
+                </div>
+                <div id="res" class="text-center font-bold min-h-[30px] text-sm text-amber-200">اختر صندوقاً وابدأ التحدي</div>
+            `;
+            document.getElementById('game-content').innerHTML = html;
+
+            startTimer(20, () => {
+                document.querySelectorAll('#boxes-grid button').forEach(b => b.disabled = true);
+                document.getElementById('res').innerHTML = "<span class='text-rose-400'>⏰ انتهى الوقت!</span>";
+            });
+
+            let container = document.getElementById('boxes-grid');
+            boxContents.forEach((content, index) => {
+                let btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl transition hover-scale flex flex-col items-center justify-center";
+                btn.innerHTML = `<span class="text-3xl font-bold text-slate-200">📦</span>`;
+
+                let isOpened = false;
+                btn.onclick = () => {
+                    if (isOpened) return;
+                    isOpened = true;
+                    let r = document.getElementById('res');
+                    if (content === '💣') {
+                        btn.className = "bg-rose-900/80 border border-rose-500 p-4 rounded-xl flex flex-col items-center justify-center text-white font-bold";
+                        btn.innerHTML = `<span class="text-3xl">💣</span>`;
+                        r.innerHTML = "<span class='text-rose-400'>💥 بوووم! وقعت في الصندوق المفخخ!</span>";
+                        clearInterval(timerInterval);
+                        document.querySelectorAll('#boxes-grid button').forEach(b => b.disabled = true);
+                    } else {
+                        btn.className = "bg-emerald-800/80 border border-emerald-500 p-4 rounded-xl flex flex-col items-center justify-center text-white font-bold";
+                        btn.innerHTML = `<span class="text-3xl">${content}</span>`;
+                        openedCount++;
+                        if (openedCount === totalSafe) {
+                            clearInterval(timerInterval);
+                            r.innerHTML = "<span class='text-emerald-400 font-extrabold'>🌟 كفو! تجاوزت كل الصناديق وفزت بالنهاية!</span>";
+                            document.querySelectorAll('#boxes-grid button').forEach(b => b.disabled = true);
+                            triggerWinCelebration();
+                        } else {
+                            r.innerHTML = `<span class='text-amber-300'>✨ ممتاز! بقي ${totalSafe - openedCount} صناديق آمنة</span>`;
+                        }
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderQuestionCard(title, desc, options, correct, duration, nextCallback) {
+            let html = `
+                <div class="text-center mb-3">
+                    <h2 class="text-xl font-bold text-amber-400">${title}</h2>
+                    <div class="flex justify-between items-center mt-2 px-4 text-xs text-slate-300 bg-slate-800/60 py-1.5 rounded-xl border border-slate-700">
+                        <span class="font-bold text-amber-200 text-sm">${desc}</span>
+                        <span>⏱️ الوقت: <strong id="timer-val" class="text-amber-400 text-sm">${duration}</strong> ث</span>
+                    </div>
+                </div>
+                <div class="bg-slate-800/80 p-4 rounded-2xl text-center mb-2 border border-slate-700">
+                    <div class="grid grid-cols-2 gap-3 mt-1" id="gen-grid"></div>
+                </div>
+                <div id="res" class="text-center font-bold min-h-[30px]"></div>
+            `;
+            document.getElementById('game-content').innerHTML = html;
+
+            startTimer(duration, () => {
+                document.querySelectorAll('#gen-grid button').forEach(b => b.disabled = true);
+                document.getElementById('res').innerHTML = `
+                    <span class='text-rose-400'>⏰ انتهى الوقت!</span>
+                    <span class='text-amber-300 text-xs mt-1 block'>✨ الإجابة الصحيحة: ${correct}</span>
+                `;
+            });
+
+            let container = document.getElementById('gen-grid');
+            options.sort(() => 0.5 - Math.random()).forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl transition hover-scale flex flex-col items-center justify-center";
+                btn.innerHTML = `<span class="text-3xl font-bold text-slate-100 my-1">${opt}</span>`;
+
+                btn.onclick = () => {
+                    clearInterval(timerInterval);
+                    let r = document.getElementById('res');
+                    document.querySelectorAll('#gen-grid button').forEach(b => b.disabled = true);
+                    if(opt === correct) {
+                        btn.className = "bg-emerald-600 border border-emerald-400 p-4 rounded-xl flex flex-col items-center justify-center text-white font-bold";
+                        r.innerHTML = "<span class='text-emerald-400'>🌟 إجابة صحيحة يا بطل! كفو!</span>";
+                        triggerWinCelebration();
+                        setTimeout(nextCallback, 1800);
+                    } else {
+                        btn.className = "bg-rose-900/50 border border-rose-500 p-4 rounded-xl flex flex-col items-center justify-center text-white font-bold";
+                        r.innerHTML = `
+                            <span class='text-rose-400'>❌ خطأ!</span>
+                            <span class='text-amber-300 text-xs mt-1 block'>✨ الإجابة الصحيحة: ${correct}</span>
+                        `;
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+    </script>
+</body>
+</html>

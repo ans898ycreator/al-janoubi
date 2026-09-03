@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ردهة التحديات والعشوائيات - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hover-scale { transition: all 0.3s ease; }
+        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2); }
+        body {
+            background-image: linear-gradient(rgba(2, 6, 23, 0.75), rgba(2, 6, 23, 0.85)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col items-center justify-center p-4">
+
+    <div class="bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl backdrop-blur-md">
+
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-extrabold text-amber-400 tracking-wide">🔥 ردهة التحديات والعشوائيات الكبرى 🔥</h1>
+            <p class="text-slate-400 text-xs mt-1">اختر القسم المناسب أو اسحب تحدياً عشوائياً واصنع أجواء الحماس</p>
+        </div>
+
+        <!-- 1. الأقسام الثلاثة الجديدة -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+            <!-- قسم الأحكام (على اليمين) -->
+            <a href="/rulings" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-rose-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
+                <span class="text-3xl bg-rose-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">⚖️</span>
+                <span class="text-rose-200 font-extrabold text-xs leading-relaxed">قسم الأحكام</span>
+                <span class="text-[10px] text-slate-400 mt-1">عقوبات وتحديات فورية</span>
+            </a>
+
+            <!-- كرسي الاعتراف (في الوسط) -->
+            <a href="/hot_seat" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
+                <span class="text-3xl bg-amber-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🪑</span>
+                <span class="text-amber-200 font-extrabold text-xs leading-relaxed">كرسي الاعتراف</span>
+                <span class="text-[10px] text-slate-400 mt-1">أسئلة شخصية واجتماعية</span>
+            </a>
+
+            <!-- الألعاب الممتازة (على اليسار) -->
+            <a href="/games" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
+                <span class="text-3xl bg-emerald-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🎮</span>
+                <span class="text-emerald-200 font-extrabold text-xs leading-relaxed">الألعاب الممتازة</span>
+                <span class="text-[10px] text-slate-400 mt-1">التركيز والسرعة والألغاز</span>
+            </a>
+
+        </div>
+
+        <!-- 2. الجزء الأساسي (مولد العشوائيات والتحديات السريعة) -->
+        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 mb-6 text-center">
+            <h2 class="text-sm font-bold text-amber-300 mb-3">🎲 السحب العشوائي السريع</h2>
+
+            <div id="resultBox" class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl min-h-[80px] flex items-center justify-center text-slate-200 text-sm mb-4">
+                اضغط على الزر بالأسفل لتوليد تحدي أو عشوائية فورية للسهرة!
+            </div>
+
+            <div class="flex flex-wrap gap-2 justify-center">
+                <button onclick="getRandomChallenge()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">⚡ تحدي عشوائي</button>
+                <button onclick="getRandomRule()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">⚖️ حكم عشوائي</button>
+                <button onclick="getRandomIdea()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">💡 فكرة مجنونة</button>
+            </div>
+        </div>
+
+        <!-- زر العودة للرئيسية -->
+        <div class="pt-2 border-t border-slate-800 text-center">
+            <a href="/" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2 rounded-xl text-xs font-semibold transition border border-slate-700">🏠 العودة للرئيسية</a>
+        </div>
+
+    </div>
+
+    <!-- جافاسكريبت التحديات السريعة -->
+    <script>
+        const challenges = [
+            "قلد صوت معلق رياضي شهير لمدة 30 ثانية.",
+            "امتنع عن الضحك مهما حاول أصدقاؤك استفزازك لمدة دقيقتين.",
+            "تكلم بلهجة غريبة (مثل الفصحى القديمة أو البدوية) في الجلسة القادمة.",
+            "أرسل رسالة غريبة لصديقك واكتب له: (أنا أعرف السر الكبير.. لا تتكلم!)."
+        ];
+
+        const rules = [
+            "احكم على الشخص الذي على يسارك بغناء مقطوعة لأغنية حزينة.",
+            "يُمنع اللاعب الخاسر من التحدث بصوت عالٍ لمدة 3 جولات قادمة.",
+            "حكم فوري: يتبرع الخاسر بتجهيز المشروبات للجميع.",
+            "تغيير أماكن الجلوس فوراً لكل اللاعبين حسب اختيار الفائز."
+        ];
+
+        const ideas = [
+            "فتح بث مباشر فوري وتحدي المتابعين بأسئلة سريعة.",
+            "تشغيل أغنية حماسية وعمل سباق سرعة في الرد على تعليقات الدردشة.",
+            "تصميم مسابقة سريعة مدتها 5 دقائق لجمع أكبر عدد من النقاط."
+        ];
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomChallenge() {
+            document.getElementById('resultBox').innerText = getRandomItem(challenges);
+        }
+
+        function getRandomRule() {
+            document.getElementById('resultBox').innerText = getRandomItem(rules);
+        }
+
+        function getRandomIdea() {
+            document.getElementById('resultBox').innerText = getRandomItem(ideas);
+        }
+    </script>
+
+</body>
+</html>

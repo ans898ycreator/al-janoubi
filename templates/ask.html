@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كرسي الاعتراف - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hover-scale { transition: all 0.3s ease; }
+        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.3); }
+        body {
+            background-image: linear-gradient(rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.9)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .pulse-card { animation: pulse-slow 3s infinite ease-in-out; }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col items-center justify-center p-4">
+
+    <div class="bg-slate-900/95 border border-amber-500/40 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl backdrop-blur-md pulse-card">
+
+        <!-- رأس الصفحة -->
+        <div class="text-center mb-6">
+            <span class="text-4xl">🪑</span>
+            <h1 class="text-2xl font-extrabold text-amber-400 tracking-wide mt-2">كرسي الاعتراف والشفافية</h1>
+            <p class="text-slate-400 text-xs mt-1">أجب بكل صراحة لتحديد نسبة صراحتك النهائية في الجلسة</p>
+            <div id="counter" class="text-xs font-bold text-amber-300 mt-2 bg-amber-500/10 py-1 px-3 rounded-full inline-block border border-amber-500/20">السؤال 1 من 10</div>
+        </div>
+
+        <!-- أداة عرض السؤال الكبير والمتحرك -->
+        <div id="questionContainer" class="bg-slate-800/90 border border-slate-700 p-6 rounded-2xl text-center min-h-[140px] flex flex-col items-center justify-center mb-6 shadow-inner relative overflow-hidden transition-all duration-500">
+            <span class="absolute top-2 right-3 text-xs text-slate-500 font-mono">#سؤال_مباشر</span>
+            <h2 id="questionText" class="text-lg md:text-xl font-bold text-slate-100 leading-relaxed">جاري تحميل السؤال الأول...</h2>
+        </div>
+
+        <!-- أزرار اختيار نسبة الصراحة على الإجابة -->
+        <div id="ratingSection" class="mb-6">
+            <p class="text-center text-xs text-slate-400 mb-3 font-semibold">قيم مدى صراحة المتسابق في هذا الجواب:</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button onclick="rateAnswer(25)" class="bg-blue-600/80 hover:bg-blue-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition hover-scale shadow-lg border border-blue-500/40">🔵 25% (مراوغ)</button>
+                <button onclick="rateAnswer(50)" class="bg-amber-600/80 hover:bg-amber-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition hover-scale shadow-lg border border-amber-500/40">🟡 50% (متردد)</button>
+                <button onclick="rateAnswer(75)" class="bg-purple-600/80 hover:bg-purple-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition hover-scale shadow-lg border border-purple-500/40">🟣 75% (صريح)</button>
+                <button onclick="rateAnswer(100)" class="bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition hover-scale shadow-lg border border-emerald-500/40">🟢 100% (صراحة تامة!)</button>
+            </div>
+        </div>
+
+        <!-- قسم النتائج النهائية (يظهر تلقائياً بعد السؤال العاشر) -->
+        <div id="resultSection" class="hidden text-center bg-slate-800/90 border border-amber-500/60 p-6 rounded-2xl mb-6 relative">
+            <h3 class="text-lg font-bold text-amber-300 mb-2">🎉 انتهت رحلة كرسي الاعتراف!</h3>
+            <p class="text-xs text-slate-300 mb-2">معدل الصراحة الإجمالي للمتسابق:</p>
+            <div id="finalScore" class="text-3xl font-black text-amber-400 mb-3">0%</div>
+            <div id="specialCrown" class="text-sm font-bold text-rose-400 mt-2"></div>
+            <!-- تأثيرات مفرقعات وورد -->
+            <div id="partyEffects" class="text-2xl mt-3 flex justify-center gap-2"></div>
+        </div>
+
+        <!-- زر العودة للرئيسية -->
+        <div class="pt-2 border-t border-slate-800 text-center">
+            <a href="/" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2 rounded-xl text-xs font-semibold transition border border-slate-700">🏠 العودة للرئيسية</a>
+        </div>
+
+    </div>
+
+    <!-- كود الجافاسكريبت المتقدم لأكثر من 50 سؤال وتنسيق النتائج -->
+    <script>
+        // قاعدة بيانات ضخمة تحتوي على أكثر من 50 سؤال متنوع لكرسي الاعتراف
+        const allQuestions = [
+            "ما هو أكبر سر تخفيه عن عائلتك حتى الآن؟",
+            "لو ملكت زر حذف يوم من حياتك، أي يوم ستختار ولماذا؟",
+            "من هو الشخص الذي لا ترفض له طلباً أبداً مهما كانت الظروف؟",
+            "ما هي أكثر موقف شعرت فيه بالاحراج الشديد أمام أصدقائك؟",
+            "هل سبق وأن كذبت كذبة كبيرة ونجيت منها؟ ما هي؟",
+            "ما هو الشيء الذي تفعله سرا وتخاف أن يكتشفه الآخرون؟",
+            "لو خيروك بين العيش بثراء بلا أصدقاء، أو بفقر مع أصدقاء أوفياء، ماذا تختار؟",
+            "ما هو الندم الأكبر في حياتك حتى هذه اللحظة؟",
+            "هل تفضل الانتقام ممن أذوك أم تسامح وتنسى تماماً؟",
+            "ما هي الصفة التي تكرهها في نفسك وتتمنى تغييرها؟",
+            "من هو الشخص الذي تمنيت لو لم تقابله في حياتك أبداً؟",
+            "هل بكيت مؤخراً سرا؟ ما السبب؟",
+            "ما هو أغبى شيء قامت به في مرحلة الطفولة؟",
+            "لو عاد بك الزمن للوراء، أي قرار ستغيره فوراً؟",
+            "ما هو رأيك الحقيقي في الشخص الذي يجلس على يسارك الآن؟ (بصراحة!)",
+            "هل قمت يوماً بسرقة شيء ما مهما كان صغيراً؟",
+            "ما هي العادة السيئة التي تعجز عن التخلص منها؟",
+            "متى كانت آخر مرة شعر فيها بالخوف الشديد، ولماذا؟",
+            "لو طُلب منك الاعتذار لشخص واحد فوراً، لمن ستتوجه بالاعتذار؟",
+            "ما هي الكلمة أو العبارة التي تجرحك أكثر إذا سمعتها من شخص قريب؟",
+            "هل أنت مستعد للتضحية بأهم شيء تمتلكه من أجل شخص تحبه؟",
+            "ما هو مقلب قمت به في صديقك وندمت عليه لاحقاً؟",
+            "من هو الشخص الأكثر تأثيراً في شخصيتك وطريقة تفكيرك؟",
+            "هل تعتبر نفسك شخصاً غيوراً؟ في أي مواقف يظهر ذلك؟",
+            "ما هو الحلم الأبرز الذي تخاف ألا تحققه أبداً؟",
+            "هل تعتقد أن المال هو أساس السعادة أم مجرد وسيلة؟",
+            "ما هو الموقف الذي جعل تغير نظرتك للناس 180 درجة؟",
+            "لو اكتشفت سر كبير عن صديق مقرب، هل ستواجهه أم تحتفظ به؟",
+            "ما هو أكثر كتاب أو فيلم أثر في مشاعرك؟",
+            "ما هو السؤال الذي تخاف دائماً أن يوجهه لك أحد؟",
+            "هل ترضى بالوظيفة الحالية طوال حياتك أم لديك طموح مجنون؟",
+            "ما هو أول شيء تنظر إليه في الشخص الذي تقابله لأول مرة؟",
+            "هل تحتفظ برسائل أو ذكريات قديمة لأشخاص غادروا حياتك؟",
+            "ما هو شعورك الحقيقي عندما ينجح شخص تكرهه أو تنافسه؟",
+            "هل تفضل العيش بمفردك كليا أم وسط عائلة وجماعة صاخبة؟",
+            "متى شعرت أنك كنت ظالماً بحق شخص آخر؟",
+            "ما هو الرد الأكثر إحراجاً الذي تلقيته في حياتك؟",
+            "لو سمح لك بتغيير اسمك، ماذا ستسمي نفسك ولماذا؟",
+            "ما هو أكثر شيء تندففع لشرائه ثم تندم عليه؟",
+            "هل تميل إلى كتمان أسرارك أم تشاركها مع شخص مقرب جداً؟",
+            "ما هو الموقف الذي أظهر لك المعدن الحقيقي لأصدقائك؟",
+            "هل تتأثر بسهولة بما يقوله الناس عنك وراء ظهرك؟",
+            "ما هي الصدمة الأكبر التي تلقتها في حياتك الاجتماعية أو العملية؟",
+            "لو استطاعت قراءة أفكار الآخرين لمدة ساعة، من ستراقب أولاً؟",
+            "ما هو السر الذي لم تقله لصديقك المقرب أبداً؟",
+            "هل تعتقد أن الحظ يلعب الدور الأكبر في النجاح أم الاجتهاد؟",
+            "ما هو أكثر موقف شعرت فيه بالامتنان الشديد تجاه شخص معين؟",
+            "هل تمارس الكذب الأبيض لتجنب المشاكل أم تؤمن بالصراحة المطلقة دائماً؟",
+            "ما هو التحدي الأكبر الذي تخطيت في حياتك وكنت فخوراً بنفسك لأجله؟",
+            "لو أتيحت لك فرصة السفر الفوري لأي مكان في العالم، إلى أين تذهب ومن تأخذ معك؟"
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let totalScoreSum = 0;
+
+        // اختيار 10 أسئلة عشوائية فريدة لكل جلسة سهرة جديدة
+        function initGame() {
+            // خلط الأسئلة عشوائياً
+            let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            currentQuestions = shuffled.slice(0, 10); // أخذ 10 أسئلة فقط
+            currentIndex = 0;
+            totalScoreSum = 0;
+
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('ratingSection').classList.remove('hidden');
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            if (currentIndex < 10) {
+                document.getElementById('counter').innerText = `السؤال ${currentIndex + 1} من 10`;
+                let qBox = document.getElementById('questionText');
+                qBox.style.opacity = 0;
+                setTimeout(() => {
+                    qBox.innerText = currentQuestions[currentIndex];
+                    qBox.style.opacity = 1;
+                }, 200);
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function rateAnswer(percentage) {
+            totalScoreSum += percentage;
+            currentIndex++;
+            displayQuestion();
+        }
+
+        function showFinalResults() {
+            document.getElementById('ratingSection').classList.add('hidden');
+            document.getElementById('questionContainer').classList.add('hidden');
+            document.getElementById('counter').style.display = 'none';
+
+            let average = Math.round(totalScoreSum / 10);
+            let finalScoreEl = document.getElementById('finalScore');
+            let crownEl = document.getElementById('specialCrown');
+            let partyEl = document.getElementById('partyEffects');
+
+            finalScoreEl.innerText = average + "%";
+            let resultSection = document.getElementById('resultSection');
+            resultSection.classList.remove('hidden');
+
+            if (average === 100) {
+                crownEl.innerText = "أنت ملك الصراحة!";
+                partyEl.innerHTML = "🎆 🎇 🎉 🌹 💖 🎈 ✨ 👑";
+            } else if (average >= 75) {
+                crownEl.innerText = "شخص صريح وشفاف جداً، ممتاز!";
+                partyEl.innerHTML = "🌟 👏 🎯";
+            } else if (average >= 50) {
+                crownEl.innerText = "صراحتك متوسطة، تحتاج لجرأة أكثر في المرات القادمة!";
+                partyEl.innerHTML = "💡 ⚖️";
+            } else {
+                crownEl.innerText = "كنت مراوغاً جداً اليوم ولم تكشف كل أوراقك!";
+                partyEl.innerHTML = "🕶️ 🤫";
+            }
+        }
+
+        // بدء اللعبة تلقائياً عند تحميل الصفحة
+        window.onload = initGame;
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>استعادة وتغيير الرمز - عالم حمودي الجنوبي</title>
+    <style>
+        @keyframes goldGlow {
+            0% { text-shadow: 0 0 10px #ffb300, 0 0 20px #ff8f00; color: #ffb300; }
+            50% { text-shadow: 0 0 20px #ffea00, 0 0 30px #ffd54f; color: #ffe57f; }
+            100% { text-shadow: 0 0 10px #ffb300, 0 0 20px #ff8f00; color: #ffb300; }
+        }
+
+        body {
+            font-family: Tahoma, sans-serif;
+            background: #0b0b0e;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(26, 26, 46, 0.6) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(35, 19, 39, 0.6) 0%, transparent 40%),
+                linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8));
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            direction: rtl;
+        }
+
+        .card {
+            background: rgba(20, 20, 25, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 179, 0, 0.2);
+            padding: 35px;
+            border-radius: 16px;
+            width: 380px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            text-align: right;
+        }
+
+        h2 {
+            text-align: center;
+            animation: goldGlow 3s infinite;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        label { color: #b0bec5; font-size: 14px; font-weight: bold; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 16px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #16161a;
+            color: #fff;
+            text-align: right;
+            box-sizing: border-box;
+        }
+
+        button, .wa-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover, .wa-btn:hover {
+            background: linear-gradient(135deg, #20ba5a, #0e7065);
+            box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffb300, #ff8f00);
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ffa000, #ff6f00);
+            box-shadow: 0 0 15px rgba(255, 179, 0, 0.4);
+        }
+
+        .msg { background: rgba(255, 179, 0, 0.1); border: 1px solid #ffb300; padding: 10px; border-radius: 6px; color: #ffb300; font-size: 13px; margin-bottom: 15px; text-align: center; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #888; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: #ffb300; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🔒 استعادة وتغيير الرمز</h2>
+
+        {% if msg %}
+            <div class="msg">{{ msg }}</div>
+        {% endif %}
+
+        {% if step == 1 %}
+        <!-- الخطوة 1: إدخال رقم الموبايل -->
+        <form method="POST">
+            <input type="hidden" name="action" value="send_code">
+            <label>رقم الموبايل:</label>
+            <input type="text" name="phone" placeholder="ضع الرقم فقط" required>
+            <button type="submit" class="btn-primary">الحصول على كود التحقق 📱</button>
+        </form>
+        {% elif step == 2 %}
+        <!-- الخطوة 2: زر يفتح الواتساب فوراً برمزك المخصص، ثم إدخال الكود -->
+        <div style="text-align: center; margin-bottom: 15px;">
+            <p style="font-size: 13px; color: #b0bec5; margin-bottom: 8px;">اضغط على الزر أدناه لإرسال الرمز عبر واتساب:</p>
+            <a href="{{ wa_link }}" target="_blank" class="wa-btn">💬 اضغط هنا لإرسال الرمز عبر واتساب</a>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="action" value="verify_and_change">
+            <input type="hidden" name="phone" value="{{ phone }}">
+            <label>أدخل كود التحقق الذي ظهر لك:</label>
+            <input type="text" name="otp" placeholder="أدخل الأرقام" required>
+            <label>كلمة المرور الجديدة:</label>
+            <input type="password" name="new_password" placeholder="الرمز الجديد" required>
+            <button type="submit" class="btn-primary">تغيير الرمز الآن ⚡</button>
+        </form>
+        {% endif %}
+
+        <a href="/login" class="back-link">العودة لتسجيل الدخول</a>
+    </div>
+</body>
+</html>
