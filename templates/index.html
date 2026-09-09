@@ -118,18 +118,19 @@
         });
     </script>
 <script>
-    const isOwner = localStorage.getItem('is_admin_host') === 'true';
+        const isOwner = localStorage.getItem('is_admin_host') === 'true';
 
-    window.addEventListener('DOMContentLoaded', () => {
-        if (!isOwner) {
-            const elements = document.querySelectorAll('button, input, select, textarea, .btn');
-            elements.forEach(el => {
-                el.disabled = true;
-                el.style.pointerEvents = 'none';
-                el.style.opacity = '0.7';
-            });
-        }
-    });
-</script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!isOwner) {
+                const elements = document.querySelectorAll('button, input, select, textarea, a.btn, .clickable');
+                elements.forEach(el => {
+                    el.disabled = true;
+                    el.style.pointerEvents = 'none';
+                    el.style.opacity = '0.5';
+                    el.style.cursor = 'not-allowed';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
