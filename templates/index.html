@@ -122,13 +122,15 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!isOwner) {
-                const elements = document.querySelectorAll('button, input, select, textarea, a.btn, .clickable');
+                // استهداف الأزرار، حقول الإدخال، وكل الروابط التي تعمل كأزرار في القائمة
+                const elements = document.querySelectorAll('button, input, select, textarea, a, .btn, .clickable');
                 elements.forEach(el => {
-                    el.disabled = true;
-                    el.style.pointerEvents = 'none';
-                    el.style.opacity = '0.5';
+                    el.removeAttribute('href'); // يمنع الانتقال لأي رابط تماماً
+                    el.style.pointerEvents = 'none'; // يمنع النقرات
+                    el.style.opacity = '0.6'; // جعلها باهتة للمتابع
                     el.style.cursor = 'not-allowed';
                 });
+                console.log("وضع المشاهدة مفعل بالكامل");
             }
         });
     </script>
