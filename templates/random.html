@@ -3,115 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ردهة التحديات والعشوائيات - عالم حمودي الجنوبي</title>
+    <title>كرسي الاعتراف المطور - عالم حمودي الجنوبي</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        .hover-scale { transition: all 0.3s ease; }
-        .hover-scale:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2); }
-        body {
-            background-image: linear-gradient(rgba(2, 6, 23, 0.75), rgba(2, 6, 23, 0.85)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
+        body { font-family: 'Cairo', sans-serif; }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(234, 179, 8, 0.8); }
         }
+        .glow-card { animation: pulseGlow 3s infinite; }
     </style>
 </head>
-<body class="text-slate-100 flex flex-col items-center justify-center p-4">
+<body class="bg-gradient-to-br from-gray-950 via-purple-950 to-indigo-950 text-white min-h-screen flex flex-col items-center justify-between p-4 selection:bg-pink-500 selection:text-white">
 
-    <div class="bg-slate-900/90 border border-amber-500/30 rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl backdrop-blur-md">
+    <!-- رأس الصفحة -->
+    <header class="w-full max-w-2xl text-center py-4">
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-yellow-300 to-cyan-400">
+            🪑 كرسي الاعتراف التحدي
+        </h1>
+        <p class="text-gray-400 text-xs mt-1">اختبر صراحتك وشجاعتك عبر 5 أسئلة تصاعدية!</p>
+    </header>
 
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-extrabold text-amber-400 tracking-wide">🔥 ردهة التحديات والعشوائيات الكبرى 🔥</h1>
-            <p class="text-slate-400 text-xs mt-1">اختر القسم المناسب أو اسحب تحدياً عشوائياً واصنع أجواء الحماس</p>
-        </div>
+    <!-- المحتوى الرئيسي -->
+    <main class="w-full max-w-2xl flex flex-col gap-5 my-auto">
 
-        <!-- 1. الأقسام الثلاثة الجديدة -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-
-            <!-- قسم الأحكام (على اليمين) -->
-            <a href="/rulings" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-rose-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
-                <span class="text-3xl bg-rose-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">⚖️</span>
-                <span class="text-rose-200 font-extrabold text-xs leading-relaxed">قسم الأحكام</span>
-                <span class="text-[10px] text-slate-400 mt-1">عقوبات وتحديات فورية</span>
-            </a>
-
-            <!-- كرسي الاعتراف (في الوسط) -->
-            <a href="/hot_seat" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
-                <span class="text-3xl bg-amber-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🪑</span>
-                <span class="text-amber-200 font-extrabold text-xs leading-relaxed">كرسي الاعتراف</span>
-                <span class="text-[10px] text-slate-400 mt-1">أسئلة شخصية واجتماعية</span>
-            </a>
-
-            <!-- الألعاب الممتازة (على اليسار) -->
-            <a href="/games" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500/50 p-5 rounded-2xl transition flex flex-col items-center justify-center text-center hover-scale group shadow-lg">
-                <span class="text-3xl bg-emerald-500/20 p-3 rounded-2xl mb-2 group-hover:scale-110 transition">🎮</span>
-                <span class="text-emerald-200 font-extrabold text-xs leading-relaxed">الألعاب الممتازة</span>
-                <span class="text-[10px] text-slate-400 mt-1">التركيز والسرعة والألغاز</span>
-            </a>
-
-        </div>
-
-        <!-- 2. الجزء الأساسي (مولد العشوائيات والتحديات السريعة) -->
-        <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-5 mb-6 text-center">
-            <h2 class="text-sm font-bold text-amber-300 mb-3">🎲 السحب العشوائي السريع</h2>
-
-            <div id="resultBox" class="bg-slate-900/80 border border-slate-700 p-4 rounded-xl min-h-[80px] flex items-center justify-center text-slate-200 text-sm mb-4">
-                اضغط على الزر بالأسفل لتوليد تحدي أو عشوائية فورية للسهرة!
-            </div>
-
-            <div class="flex flex-wrap gap-2 justify-center">
-                <button onclick="getRandomChallenge()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">⚡ تحدي عشوائي</button>
-                <button onclick="getRandomRule()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">⚖️ حكم عشوائي</button>
-                <button onclick="getRandomIdea()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-md">💡 فكرة مجنونة</button>
+        <!-- شاشة اختيار مستوى الصعوبة (البداية) -->
+        <div id="difficultyScreen" class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/15 text-center flex flex-col gap-5">
+            <h2 class="text-xl font-bold text-yellow-300"><i class="fa-solid fa-layer-group ml-2"></i>اختر مستوى قوة الأسئلة لجلسة التحدي:</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button onclick="startGame('easy')" class="group relative bg-gradient-to-br from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 p-5 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 border border-emerald-400/30 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-face-smile text-3xl text-emerald-200 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-bold text-lg">سهل وخفيف</span>
+                    <span class="text-xs text-emerald-200/80">أسئلة لطيفة ومسلية</span>
+                </button>
+                <button onclick="startGame('medium')" class="group relative bg-gradient-to-br from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 p-5 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 border border-amber-400/30 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-face-grimace text-3xl text-amber-200 group-hover:scale-110 transition-transform"></i>
+                    <span class="font-bold text-lg">متوسط الجرأة</span>
+                    <span class="text-xs text-amber-200/80">تحتاج صراحة أكبر</span>
+                </button>
+                <button onclick="startGame('hard')" class="group relative bg-gradient-to-br from-rose-600 to-red-800 hover:from-rose-500 hover:to-red-700 p-5 rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 border border-rose-400/30 flex flex-col items-center gap-2">
+                    <i class="fa-solid fa-fire text-3xl text-rose-200 group-hover:scale-110 transition-transform animate-bounce"></i>
+                    <span class="font-bold text-lg">صعب وناري 🔥</span>
+                    <span class="text-xs text-rose-200/80">للشجعان فقط!</span>
+                </button>
             </div>
         </div>
 
-        <!-- زر العودة للرئيسية -->
-        <div class="pt-2 border-t border-slate-800 text-center">
-            <a href="/" class="inline-block bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2 rounded-xl text-xs font-semibold transition border border-slate-700">🏠 العودة للرئيسية</a>
+        <!-- شاشة السؤال الكبرى التفاعلية (مخفية بالبداية) -->
+        <div id="gameScreen" class="hidden bg-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/15 flex flex-col gap-6 glow-card">
+            <!-- شريط التقدم -->
+            <div class="flex justify-between items-center text-sm text-gray-300 border-b border-white/10 pb-3">
+                <span id="questionProgress" class="bg-pink-500/20 text-pink-300 px-3 py-1 rounded-full font-bold border border-pink-500/30">السؤال 1 من 5</span>
+                <span id="modeBadge" class="text-yellow-400 font-bold"></span>
+            </div>
+
+            <!-- الأيقونة والسؤال الكبير -->
+            <div class="text-center py-4 flex flex-col items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-lg text-3xl animate-pulse">
+                    <i class="fa-solid fa-question text-white"></i>
+                </div>
+                <h3 id="questionText" class="text-xl sm:text-2xl font-black text-white leading-relaxed px-2">
+                    <!-- نص السؤال يظهر هنا -->
+                </h3>
+            </div>
+
+            <!-- أزرار اختيار نسبة الصراحة بعد الإجابة -->
+            <div class="flex flex-col gap-3 pt-2">
+                <p class="text-xs text-center text-pink-300 font-semibold">كم كانت نسبة صراحة المتسابق في إجابته؟</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button onclick="recordScore(25)" class="bg-red-500/20 hover:bg-red-500/40 border border-red-500/40 py-3 rounded-xl font-bold transition-all text-red-300">25% (تهرب)</button>
+                    <button onclick="recordScore(50)" class="bg-yellow-500/20 hover:bg-yellow-500/40 border border-yellow-500/40 py-3 rounded-xl font-bold transition-all text-yellow-300">50% (نصف صريح)</button>
+                    <button onclick="recordScore(75)" class="bg-blue-500/20 hover:bg-blue-500/40 border border-blue-500/40 py-3 rounded-xl font-bold transition-all text-blue-300">75% (شجاع)</button>
+                    <button onclick="recordScore(100)" class="bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/40 py-3 rounded-xl font-bold transition-all text-emerald-300">100% (صراحة تامة 🔥)</button>
+                </div>
+            </div>
         </div>
 
-    </div>
+        <!-- شاشة النتائج النهائية (مخفية بالبداية) -->
+        <div id="resultScreen" class="hidden bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/15 text-center flex flex-col items-center gap-6">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 flex items-center justify-center text-4xl shadow-xl animate-bounce">
+                <i class="fa-solid fa-trophy text-white"></i>
+            </div>
+            <h2 class="text-2xl font-black text-yellow-300">انتهت جولة كرسي الاعتراف بنجاح!</h2>
+            <div class="flex flex-col gap-2 bg-black/30 p-5 rounded-2xl w-full border border-white/10">
+                <span class="text-gray-400 text-sm">النسبة الكلية لصراحة المتسابق:</span>
+                <span id="finalScoreText" class="text-4xl font-black text-pink-400">0%</span>
+                <p id="finalComment" class="text-xs text-gray-300 mt-1"></p>
+            </div>
+            <button onclick="resetGame()" class="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-bold py-3 px-8 rounded-xl shadow-lg transition-all w-full">
+                🔄 بدء جولة جديدة
+            </button>
+        </div>
 
-    <!-- جافاسكريبت التحديات السريعة -->
+    </main>
+
+    <!-- زر العودة للرئيسية -->
+    <footer class="w-full max-w-2xl text-center py-3">
+        <a href="/" class="inline-block bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white py-2 px-6 rounded-xl transition-all text-xs font-semibold border border-white/10">
+            ← العودة للرئيسية
+        </a>
+    </footer>
+
+    <!-- سكربت اللعبة وتوليد الأسئلة -->
     <script>
-        const challenges = [
-            "قلد صوت معلق رياضي شهير لمدة 30 ثانية.",
-            "امتنع عن الضحك مهما حاول أصدقاؤك استفزازك لمدة دقيقتين.",
-            "تكلم بلهجة غريبة (مثل الفصحى القديمة أو البدوية) في الجلسة القادمة.",
-            "أرسل رسالة غريبة لصديقك واكتب له: (أنا أعرف السر الكبير.. لا تتكلم!)."
-        ];
+        const questionPool = {
+            easy: [
+                "ما هو أكثر موقف محرج تعرضت له أمام عائلتك؟",
+                "لو تم تعيينك رئيساً للوزراء ليوم واحد، ما هو أول قرار ستتخذه؟",
+                "ما هي العادة السيئة التي تتمنى التخلص منها؟",
+                "من هو الشخص الأكثر تأثير بحياتك ولماذا؟",
+                "ما هي الأكلة التي لا يمكن أن تمل منها أبداً؟",
+                "لو قيل لك اختر دولة تعيش فيها بقية حياتك، ماذا تختار؟"
+            ],
+            medium: [
+                "ما هي أكبر كذبة كذبتها بحياتك ونجحت فيها؟",
+                "هل فكرت يوماً بالانسحاب من كل شيء والاختفاء لفترة؟",
+                "موقف تمنيت لو أنك تستطيع إرجاع الزمن لتغييره؟",
+                "ما هو السر الذي تخفيه عن أقرب أصدقائك؟",
+                "هل تعرضت للخيانة من شخص عزيز، وكيف تصرفت؟",
+                "ما هي الكلمة التي تجرحك فوراً إذا وجهت إليك؟"
+            ],
+            hard: [
+                "من هو الشخص الذي لا تستطيع مسامحته مهما حدث؟",
+                "ما هو الشيء الذي تفعله سراً وتخاف أن يكتشفه أحد؟",
+                "متى كانت آخر مرة بكيت فيها بحرقة ولماذا؟",
+                "لو كان بإمكانك مسح شخص واحد من ذاكرتك للأبد، من يكون؟",
+                "ما هو اعترافك الأجرأ الذي لم تكن تجرؤ على قوله لأحد؟",
+                "هل شعرت بالغيرة الشديدة من شخص قريب منك، من هو؟"
+            ]
+        };
 
-        const rules = [
-            "احكم على الشخص الذي على يسارك بغناء مقطوعة لأغنية حزينة.",
-            "يُمنع اللاعب الخاسر من التحدث بصوت عالٍ لمدة 3 جولات قادمة.",
-            "حكم فوري: يتبرع الخاسر بتجهيز المشروبات للجميع.",
-            "تغيير أماكن الجلوس فوراً لكل اللاعبين حسب اختيار الفائز."
-        ];
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let totalScoreSum = 0;
+        let selectedModeName = "";
 
-        const ideas = [
-            "فتح بث مباشر فوري وتحدي المتابعين بأسئلة سريعة.",
-            "تشغيل أغنية حماسية وعمل سباق سرعة في الرد على تعليقات الدردشة.",
-            "تصميم مسابقة سريعة مدتها 5 دقائق لجمع أكبر عدد من النقاط."
-        ];
+        function startGame(mode) {
+            selectedModeName = mode === 'easy' ? 'سهل' : mode === 'medium' ? 'متوسط' : 'صعب وناري 🔥';
+            document.getElementById('modeBadge').innerText = "المستوى: " + selectedModeName;
 
-        function getRandomItem(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+            // اختيار 5 أسئلة عشوائية فريدة بدون تكرار من الفئة المحددة
+            let pool = [...questionPool[mode]];
+            currentQuestions = [];
+            for(let i = 0; i < 5; i++) {
+                if(pool.length === 0) break;
+                let randomIndex = Math.floor(Math.random() * pool.length);
+                currentQuestions.push(pool.splice(randomIndex, 1)[0]);
+            }
+
+            currentIndex = 0;
+            totalScoreSum = 0;
+
+            document.getElementById('difficultyScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            loadQuestion();
         }
 
-        function getRandomChallenge() {
-            document.getElementById('resultBox').innerText = getRandomItem(challenges);
+        function loadQuestion() {
+            document.getElementById('questionProgress').innerText = `السؤال ${currentIndex + 1} من 5`;
+            document.getElementById('questionText').innerText = currentQuestions[currentIndex];
         }
 
-        function getRandomRule() {
-            document.getElementById('resultBox').innerText = getRandomItem(rules);
+        function recordScore(score) {
+            totalScoreSum += score;
+            currentIndex++;
+
+            if(currentIndex < 5) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
         }
 
-        function getRandomIdea() {
-            document.getElementById('resultBox').innerText = getRandomItem(ideas);
+        function showResults() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            let finalAverage = Math.round(totalScoreSum / 5);
+            document.getElementById('finalScoreText').innerText = finalAverage + "%";
+
+            let comment = "";
+            if(finalAverage >= 90) {
+                comment = "🏆 أسطورة الصراحة والشجاعة! لم تخفِ شيئاً وواجهت كرسي الاعتراف بكل قوة.";
+            } else if(finalAverage >= 70) {
+                comment = "🌟 صراحة عالية جداً وممتازة، أثبت شجاعتك الكبيرة على الكرسي.";
+            } else if(finalAverage >= 50) {
+                comment = "⚖️ صراحة مقبولة، لكن يبدو أنك تهربت من بعض الأسئلة الحساسة!";
+            } else {
+                comment = "🐢 تهرب واضح ومدافع قوي! كنت متحفظاً جداً ولم تكشف الكثير.";
+            }
+            document.getElementById('finalComment').innerText = comment;
+        }
+
+        function resetGame() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('difficultyScreen').classList.remove('hidden');
         }
     </script>
-
 </body>
 </html>

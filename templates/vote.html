@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز التصويت والمعارك الفوري</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-[#0b0f19] text-white min-h-screen p-4 flex flex-col items-center justify-between">
+
+    <header class="w-full max-w-xl text-center py-2 flex flex-col gap-1">
+        <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400">
+            ■ مركز التصويت والمعارك الفوري
+        </h1>
+        <p class="text-xs text-slate-400">تنافس، صوت، وشاهد احتفالات الفوز الحية!</p>
+    </header>
+
+    <main class="w-full max-w-xl bg-[#131b2e] border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-5 my-auto">
+
+        <div class="grid grid-cols-2 gap-2 bg-[#0d1322] p-1.5 rounded-xl border border-slate-800">
+            <button onclick="switchTab('battle')" id="tabBtnBattle" class="bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2">
+                <span>🔥</span> المعركة الشخصية
+            </button>
+            <button onclick="switchTab('general')" id="tabBtnGeneral" class="bg-transparent hover:bg-slate-800 text-slate-400 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
+                <span>👥</span> التصويت العام
+            </button>
+        </div>
+
+        <!-- القسم الأول: المعركة الشخصية -->
+        <div id="sectionBattle" class="flex flex-col gap-4">
+            <div class="bg-[#1a233a]/60 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3">
+                <div class="text-center">
+                    <h3 class="text-xs font-bold text-slate-300">⚔️ معركة الأصوات الثنائية</h3>
+                    <p class="text-[10px] text-slate-400 mt-0.5">اضغط على بدء المعركة ليتم تفعيل التصويت فوراً!</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="battleNameA" value="حمودي الجنوبي" class="bg-[#0b0f19] border border-slate-700 rounded-xl px-3 py-2 text-xs text-rose-300 text-center font-bold focus:outline-none">
+                    <input type="text" id="battleNameB" value="محمد حسين" class="bg-[#0b0f19] border border-slate-700 rounded-xl px-3 py-2 text-xs text-cyan-300 text-center font-bold focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="startBattleTimer()" class="bg-indigo-600 hover:bg-indigo-500 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-1.5">
+                        <span>🚀</span> بدء معركة الوقت
+                    </button>
+                    <select id="battleDurationSelect" class="bg-[#0b0f19] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 text-center focus:outline-none">
+                        <option value="1">دقيقة واحدة (1 د)</option>
+                        <option value="5">5 دقائق</option>
+                        <option value="10">10 دقائق</option>
+                        <option value="15">15 دقيقة</option>
+                        <option value="20" selected>20 دقيقة</option>
+                    </select>
+                </div>
+
+                <div id="battleTimerBox" class="hidden bg-rose-600/20 border border-rose-500/40 text-rose-300 text-center py-2 rounded-xl text-xs font-bold">
+                    ⏳ متبقي بالمعركة: <span id="battleClock">00:00</span>
+                </div>
+                <div id="battleNotStartedBox" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-center py-2 rounded-xl text-xs font-bold">
+                    ⏸️ التصويت متوقف حالياً، بانتظار الضغط على زر "بدء معركة الوقت"!
+                </div>
+                <div id="battleEndedBox" class="hidden bg-rose-950/40 border border-rose-800/60 text-rose-400 text-center py-2 rounded-xl text-xs font-bold">
+                    انتهت معركة الوقت! وتوقف التصويت.
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <div class="flex justify-between text-xs font-bold px-1">
+                    <span id="labelSideA" class="text-rose-400">حمودي الجنوبي</span>
+                    <span id="labelSideB" class="text-cyan-400">محمد حسين</span>
+                </div>
+                <div class="w-full h-8 bg-[#0b0f19] rounded-xl overflow-hidden flex p-1 border border-slate-800">
+                    <div id="barSideA" class="bg-cyan-500 h-full rounded-lg transition-all duration-300 flex items-center justify-center text-[11px] font-black shadow" style="width: 50%;">50%</div>
+                    <div id="barSideB" class="bg-rose-600 h-full rounded-lg transition-all duration-300 flex items-center justify-center text-[11px] font-black shadow" style="width: 50%;">50%</div>
+                </div>
+                <div class="flex justify-between text-[11px] text-slate-400 px-1 font-bold">
+                    <span id="countTextA">0 أصوات</span>
+                    <span id="countTextB">0 أصوات</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="voteBattle('A')" id="btnVoteA" class="bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2">
+                    <span>⚡</span> تصويت لـ (<span id="btnTextA">حمودي الجنوبي</span>)
+                </button>
+                <button onclick="voteBattle('B')" id="btnVoteB" class="bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2">
+                    <span>❤️</span> تصويت لـ (<span id="btnTextB">محمد حسين</span>)
+                </button>
+            </div>
+            <div id="alertBattleVoted" class="hidden bg-amber-500/20 border border-amber-500/40 text-amber-300 text-center p-2 rounded-xl text-xs font-bold">
+                ⚠️ عذراً، لا يمكنك التصويت سوى مرة واحدة فقط!
+            </div>
+        </div>
+
+        <!-- القسم الثاني: التصويت العام -->
+        <div id="sectionGeneral" class="hidden flex flex-col gap-4">
+            <div class="bg-[#1a233a]/60 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3">
+                <span class="text-xs font-bold text-cyan-400">➕ إضافة المتنافسين وتحديد الوقت:</span>
+                <div class="flex gap-2">
+                    <input type="text" id="inputGenName" placeholder="اسم المرشح..." class="flex-1 bg-[#0b0f19] border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-cyan-500">
+                    <button onclick="addGeneralCandidate()" class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-xl text-xs font-bold transition-all">إضافة</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="startGeneralTimer()" class="bg-cyan-600 hover:bg-cyan-500 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-1.5">
+                        <span>🚀</span> بدء التصويت العام
+                    </button>
+                    <select id="generalDurationSelect" class="bg-[#0b0f19] border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 text-center focus:outline-none">
+                        <option value="1">دقيقة واحدة (1 د)</option>
+                        <option value="5">5 دقائق</option>
+                        <option value="10">10 دقائق</option>
+                        <option value="15">15 دقيقة</option>
+                        <option value="20" selected>20 دقيقة</option>
+                    </select>
+                </div>
+
+                <div id="generalTimerBox" class="hidden bg-cyan-600/20 border border-cyan-500/40 text-cyan-300 text-center py-2 rounded-xl text-xs font-bold">
+                    ⏳ متبقي بالتصويت العام: <span id="generalClock">00:00</span>
+                </div>
+                <div id="generalNotStartedBox" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-center py-2 rounded-xl text-xs font-bold">
+                    ⏸️ التصويت العام متوقف، بانتظار الضغط على زر "بدء التصويت العام"!
+                </div>
+                <div id="generalEndedBox" class="hidden bg-cyan-950/40 border border-cyan-800/60 text-cyan-400 text-center py-2 rounded-xl text-xs font-bold">
+                    انتهى وقت التصويت العام! وتوقف التصويت.
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center px-1">
+                <span class="text-xs text-slate-400 font-bold">قائمة المرشحين:</span>
+                <button onclick="resetAllData()" class="bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/40 px-3 py-1.5 rounded-xl text-[11px] font-bold text-rose-300 transition-all">🔄 إعادة ضبط الكل</button>
+            </div>
+
+            <div id="generalCandidatesContainer" class="flex flex-col gap-2.5 max-h-56 overflow-y-auto pr-1">
+                <p class="text-center text-xs text-slate-500 py-4">أضف مرشحين وابدأ الجولة لعرضهم هنا...</p>
+            </div>
+
+            <div id="alertGeneralVoted" class="hidden bg-amber-500/20 border border-amber-500/40 text-amber-300 text-center p-2 rounded-xl text-xs font-bold">
+                ⚠️ لقد قمت بالتصويت مسبقاً، لا يمكن التصويت أكثر من مرة!
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-2">
+        <button onclick="window.location.reload()" class="bg-[#131b2e] hover:bg-slate-800 border border-slate-800 text-slate-400 px-6 py-2 rounded-xl text-xs font-bold transition-all">
+            ← العودة للرئيسية
+        </button>
+    </footer>
+
+    <script>
+        const socket = io();
+        let localCandidates = [];
+        let battleEndTime = 0;
+        let generalEndTime = 0;
+        let battleInterval = null;
+        let generalInterval = null;
+
+        function switchTab(tab) {
+            if(tab === 'battle') {
+                document.getElementById('sectionBattle').classList.remove('hidden');
+                document.getElementById('sectionGeneral').classList.add('hidden');
+                document.getElementById('tabBtnBattle').className = "bg-rose-600 hover:bg-rose-500 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2";
+                document.getElementById('tabBtnGeneral').className = "bg-transparent hover:bg-slate-800 text-slate-400 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2";
+            } else {
+                document.getElementById('sectionBattle').classList.add('hidden');
+                document.getElementById('sectionGeneral').classList.remove('hidden');
+                document.getElementById('tabBtnGeneral').className = "bg-cyan-600 hover:bg-cyan-500 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2";
+                document.getElementById('tabBtnBattle').className = "bg-transparent hover:bg-slate-800 text-slate-400 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2";
+            }
+        }
+
+        function startBattleTimer() {
+            const minutes = document.getElementById('battleDurationSelect').value;
+            socket.emit('sync_action', { type: 'start_battle_timer', minutes: parseFloat(minutes) });
+        }
+
+        function startGeneralTimer() {
+            const minutes = document.getElementById('generalDurationSelect').value;
+            socket.emit('sync_action', { type: 'start_general_timer', minutes: parseFloat(minutes) });
+        }
+
+        function addGeneralCandidate() {
+            const input = document.getElementById('inputGenName');
+            const name = input.value.trim();
+            if(!name) return;
+            localCandidates.push({ name: name, votes: 0 });
+            input.value = '';
+            socket.emit('sync_action', { type: 'update_general_list', candidates: localCandidates });
+        }
+
+        function voteGeneral(index) {
+            if (generalEndTime === 0 || Date.now() > generalEndTime) {
+                alert("التصويت غير متاح حالياً! يرجى الانتظار لحين بدء وقت التصويت.");
+                return;
+            }
+            if (localStorage.getItem('has_voted_general')) {
+                document.getElementById('alertGeneralVoted').classList.remove('hidden');
+                return;
+            }
+            localStorage.setItem('has_voted_general', 'true');
+            socket.emit('sync_action', { type: 'vote_general_item', index: index });
+        }
+
+        function voteBattle(side) {
+            if (battleEndTime === 0 || Date.now() > battleEndTime) {
+                alert("المعركة لم تبدأ بعد أو انتهى وقتها!");
+                return;
+            }
+            if (localStorage.getItem('has_voted_battle')) {
+                document.getElementById('alertBattleVoted').classList.remove('hidden');
+                return;
+            }
+            localStorage.setItem('has_voted_battle', 'true');
+            socket.emit('sync_action', { type: 'vote_battle_item', side: side });
+        }
+
+        function resetAllData() {
+            localStorage.removeItem('has_voted_general');
+            localStorage.removeItem('has_voted_battle');
+            socket.emit('sync_action', { type: 'reset_everything' });
+        }
+
+        document.getElementById('battleNameA').addEventListener('input', function() {
+            let val = this.value || "الطرف الأول";
+            document.getElementById('labelSideA').innerText = val;
+            document.getElementById('btnTextA').innerText = val;
+        });
+        document.getElementById('battleNameB').addEventListener('input', function() {
+            let val = this.value || "الطرف الثاني";
+            document.getElementById('labelSideB').innerText = val;
+            document.getElementById('btnTextB').innerText = val;
+        });
+
+        // عداد المعركة وتفعيل الأزرار
+        function runBattleTimer(endTime) {
+            battleEndTime = endTime;
+            if(battleInterval) clearInterval(battleInterval);
+            const box = document.getElementById('battleTimerBox');
+            const notStarted = document.getElementById('battleNotStartedBox');
+            const ended = document.getElementById('battleEndedBox');
+            const clock = document.getElementById('battleClock');
+            const btnA = document.getElementById('btnVoteA');
+            const btnB = document.getElementById('btnVoteB');
+
+            if(!endTime || endTime <= 0) {
+                box.classList.add('hidden');
+                ended.classList.add('hidden');
+                notStarted.classList.remove('hidden');
+                // قفل الأزرار
+                btnA.className = "bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+                btnB.className = "bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+                return;
+            }
+
+            notStarted.classList.add('hidden');
+            // تفعيل الأزرار بالوانها الأصلية عند بدء الوقت
+            btnA.className = "bg-indigo-600 hover:bg-indigo-500 py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+            btnB.className = "bg-rose-600 hover:bg-rose-500 py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+
+            battleInterval = setInterval(() => {
+                let rem = battleEndTime - Date.now();
+                if(rem <= 0) {
+                    clearInterval(battleInterval);
+                    box.classList.add('hidden');
+                    ended.classList.remove('hidden');
+                    // إعادة قفل الأزرار عند انتهاء الوقت
+                    btnA.className = "bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+                    btnB.className = "bg-slate-700 opacity-50 cursor-not-allowed py-3 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center gap-2";
+                } else {
+                    ended.classList.add('hidden');
+                    box.classList.remove('hidden');
+                    let secs = Math.floor(rem / 1000);
+                    let m = Math.floor(secs / 60);
+                    let s = secs % 60;
+                    clock.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // عداد التصويت العام
+        function runGeneralTimer(endTime) {
+            generalEndTime = endTime;
+            if(generalInterval) clearInterval(generalInterval);
+            const box = document.getElementById('generalTimerBox');
+            const notStarted = document.getElementById('generalNotStartedBox');
+            const ended = document.getElementById('generalEndedBox');
+            const clock = document.getElementById('generalClock');
+
+            if(!endTime || endTime <= 0) {
+                box.classList.add('hidden');
+                ended.classList.add('hidden');
+                notStarted.classList.remove('hidden');
+                return;
+            }
+
+            notStarted.classList.add('hidden');
+
+            generalInterval = setInterval(() => {
+                let rem = generalEndTime - Date.now();
+                if(rem <= 0) {
+                    clearInterval(generalInterval);
+                    box.classList.add('hidden');
+                    ended.classList.remove('hidden');
+                } else {
+                    ended.classList.add('hidden');
+                    box.classList.remove('hidden');
+                    let secs = Math.floor(rem / 1000);
+                    let m = Math.floor(secs / 60);
+                    let s = secs % 60;
+                    clock.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        socket.on('broadcast_state', function(state) {
+            runBattleTimer(state.battle_timer_end || 0);
+            runGeneralTimer(state.general_timer_end || 0);
+
+            let scoreA = state.battle_scores.A;
+            let scoreB = state.battle_scores.B;
+            let totalB = scoreA + scoreB;
+            let pctA = totalB > 0 ? Math.round((scoreA / totalB) * 100) : 50;
+            let pctB = 100 - pctA;
+
+            document.getElementById('barSideA').style.width = pctA + '%';
+            document.getElementById('barSideA').innerText = pctA + '%';
+            document.getElementById('barSideB').style.width = pctB + '%';
+            document.getElementById('barSideB').innerText = pctB + '%';
+
+            document.getElementById('countTextA').innerText = `${scoreA} أصوات`;
+            document.getElementById('countTextB').innerText = `${scoreB} أصوات`;
+
+            localCandidates = state.general_candidates;
+            const container = document.getElementById('generalCandidatesContainer');
+
+            if(localCandidates.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-slate-500 py-4">أضف مرشحين وابدأ الجولة لعرضهم هنا...</p>`;
+            } else {
+                let totalGen = localCandidates.reduce((sum, c) => sum + c.votes, 0);
+                container.innerHTML = '';
+
+                localCandidates.forEach((c, idx) => {
+                    let p = totalGen > 0 ? Math.round((c.votes / totalGen) * 100) : 0;
+                    // تفعيل أو تعطيل زر التصويت حسب حالة بدء العد التنازلي للتصويت العام
+                    let isTimerActive = (generalEndTime > 0 && Date.now() < generalEndTime);
+                    let btnClass = isTimerActive ? "bg-cyan-600 hover:bg-cyan-500 cursor-pointer" : "bg-slate-700 opacity-50 cursor-not-allowed";
+
+                    container.innerHTML += `
+                        <div class="bg-[#0b0f19] border border-slate-800 p-3 rounded-xl flex flex-col gap-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-white">${c.name}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-cyan-400 font-bold">${c.votes} صوت (${p}%)</span>
+                                    <button onclick="voteGeneral(${idx})" class="${btnClass} px-3 py-1.5 rounded-lg font-bold text-white transition-all">تصويت ✓</button>
+                                </div>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                                <div class="bg-cyan-500 h-full transition-all duration-300" style="width: ${p}%;"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

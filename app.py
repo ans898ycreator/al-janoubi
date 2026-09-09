@@ -1,61 +1,95 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+import time
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+app.config['SECRET_KEY'] = 'secure_key_999'
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# 1. صفحة تسجيل الدخول
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        return redirect(url_for('home'))
-    return render_template('login.html')
+server_data = {
+    "general_candidates": [],
+    "battle_scores": {"A": 0, "B": 0},
+    "battle_timer_end": 0,
+    "general_timer_end": 0
+}
 
-# 2. الواجهة الرئيسية
-@app.route('/home', methods=['GET', 'POST'])
-def home():
+# عداد المشاهدين المتصلين حالياً
+connected_users = 0
+
+@socketio.on('connect')
+def handle_connect():
+    global connected_users
+    connected_users += 1
+    # إرسال عدد المشاهدين المحدث لكل المتواجدين
+    socketio.emit('update_viewers', {'count': connected_users})
+    socketio.emit('broadcast_state', server_data)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    global connected_users
+    connected_users = max(0, connected_users - 1)
+    socketio.emit('update_viewers', {'count': connected_users})
+
+# المسارات (Routes)
+@app.route('/')
+def index():
     return render_template('index.html')
 
-# 3. الحقل الأول: الأسئلة العامة والمسابقات
-@app.route('/ask', methods=['GET', 'POST'])
-def ask():
+@app.route('/questions')
+def questions_page():
     return render_template('questions.html')
 
-# 4. الحقل الثاني: ألعاب التركيز والالغاز
-@app.route('/games', methods=['GET', 'POST'])
-def games():
-    return render_template('focus.html')
+@app.route('/random')
+def random_page():
+    return render_template('games.html')
 
-# 5. قسم الأحكام والتحديات
-@app.route('/rulings', methods=['GET', 'POST'])
-def rulings():
+@app.route('/ruligs')
+def ruligs_page():
     return render_template('ruligs.html')
 
-# 6. قسم كرسي الاعتراف
-@app.route('/random', methods=['GET', 'POST'])
-def random_section():
-    return render_template('ask.html')
+@app.route('/confess')
+def confess_page():
+    return render_template('random.html')
 
-# 7. لعبة نرد الحظ
-@app.route('/dice', methods=['GET', 'POST'])
-def dice_game():
+@app.route('/dice')
+def dice():
     return render_template('dice.html')
 
-# 8. لعبة السبعات 77
-@app.route('/sevens', methods=['GET', 'POST'])
-def sevens_game():
+@app.route('/sevens')
+def sevens():
     return render_template('sevens.html')
 
-# 9. لوحة التحكم الخاصة بالمالك والمشرفين
-@app.route('/dashboard', methods=['GET', 'POST'])
-def dashboard():
-    return render_template('dashboard.html')
+@app.route('/vote')
+def vote_page():
+    return render_template('vote.html')
 
-# --- نظام مزامنة الحركات الفورية أونلاين ---
-@socketio.on('player_action')
-def handle_player_action(data):
-    emit('update_game_state', data, broadcast=True)
+@app.route('/login')
+def login_page():
+    return render_template('login.html')
+
+# أحداث التزامن والمزامنة للبث واللعب
+@socketio.on('sync_action')
+def handle_sync(data):
+    global server_data
+    if not data:
+        return
+
+    action = data.get('type')
+
+    if action == 'battle_score_update':
+        side = data.get('side')
+        if side in server_data["battle_scores"]:
+            server_data["battle_scores"][side] = data.get('score', server_data["battle_scores"][side])
+            socketio.emit('broadcast_state', server_data)
+
+    elif action == 'reset_everything':
+        server_data = {
+            "general_candidates": [],
+            "battle_scores": {"A": 0, "B": 0},
+            "battle_timer_end": 0,
+            "general_timer_end": 0
+        }
+        socketio.emit('broadcast_state', server_data)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
