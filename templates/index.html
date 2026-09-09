@@ -88,55 +88,32 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script>
-        const socket = io();
 
-        function toggleLiveStream() {
-            const modal = document.getElementById('live-stream-modal');
-            modal.classList.toggle('hidden');
+    <!-- نافذة إدخال الكود للمشاهدين -->
+    <div id="code-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: #131b2e; padding: 25px; border-radius: 12px; text-align: center; border: 1px solid #334155; width: 90%; max-width: 350px;">
+            <h3 style="color: #fff; margin-bottom: 15px;">أدخل كود الدخول للمشاهدة</h3>
+            <input type="text" id="viewer-code-input" placeholder="اكتب الكود هنا..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #475569; background: #0b0f19; color: #fff; margin-bottom: 15px; text-align: center;">
+            <button onclick="checkViewerCode()" style="background: #f59e0b; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;">دخول</button>
+            <p id="error-msg" style="color: #ef4444; margin-top: 10px; font-size: 14px; display: none;">الكود غير صحيح!</p>
+        </div>
+    </div>
+
+    <script>
+        const correctCode = "313"; // الكود السري للمشاهدين
+        const isOwner = localStorage.getItem('is_admin_host') === 'true';
+
+        // إذا كنت أنت المضيف، نخفي نافذة الكود فوراً
+        if (isOwner) {
+            document.getElementById('code-modal').style.display = 'none';
         }
 
-        // استقبال وتحديث عدد المشاهدين المتصلين لحظياً
-        socket.on('update_viewers', function(data) {
-            const counter = document.getElementById('viewer-count');
-            if (counter) {
-                counter.innerText = data.count;
-            }
-        });
+        function checkViewerCode() {
+            const userInput = document.getElementById('viewer-code-input').value.trim();
+            if (userInput === correctCode) {
+                document.getElementById('code-modal').style.display = 'none';
 
-        // استقبال تحديثات اللعبة والمعارك
-        socket.on('broadcast_state', function(data) {
-            const container = document.getElementById('live-stream-content');
-            if (container && data) {
-                container.innerHTML = `
-                    <div class="text-amber-300 font-bold mb-1">🎮 حالة البث والمعركة الآن:</div>
-                    <div>نقاط الفريق (A): <span class="text-emerald-400 font-bold">${data.battle_scores ? data.battle_scores.A : 0}</span></div>
-                    <div>نقاط الفريق (B): <span class="text-teal-400 font-bold">${data.battle_scores ? data.battle_scores.B : 0}</span></div>
-                    <div class="text-[10px] text-emerald-400 mt-2">🟢 متزامن مع الشاشة الرئيسية للموقع</div>
-                `;
-            }
-        });
-   <script>
-        const isOwner = localStorage.getItem('is_admin_host') === 'true';
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!isOwner) {
-                const elements = document.querySelectorAll('button, input, select, textarea, a, .btn, .clickable');
-                elements.forEach(el => {
-                    el.removeAttribute('href');
-                    el.style.pointerEvents = 'none';
-                    el.style.opacity = '0.6';
-                    el.style.cursor = 'not-allowed';
-                });
-                console.log("وضع المشاهدة مفعل بالكامل");
-            }
-        });
-    <script>
-        const isOwner = localStorage.getItem('is_admin_host') === 'true';
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!isOwner) {
-                // قفل شامل لكل العناصر التفاعلية والروابط في الصفحة للمشاهد
+                // قفل كل العناصر للمشاهد
                 document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
                     el.removeAttribute('href');
                     el.removeAttribute('onclick');
@@ -144,17 +121,35 @@
                     el.style.opacity = '0.6';
                     el.style.cursor = 'not-allowed';
                 });
-                console.log("وضع المشاهدة الآمن مفعل: المشاهد مقفل تماماً");
+
+                sessionStorage.setItem('viewer_authenticated', 'true');
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!isOwner) {
+                if (sessionStorage.getItem('viewer_authenticated') === 'true') {
+                    document.getElementById('code-modal').style.display = 'none';
+                    document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
+                        el.removeAttribute('href');
+                        el.removeAttribute('onclick');
+                        el.style.pointerEvents = 'none';
+                        el.style.opacity = '0.6';
+                        el.style.cursor = 'not-allowed';
+                    });
+                }
             }
         });
 
         const socket = io();
-
         socket.on('broadcast_state', function(data) {
-            console.log("تم تحديث حالة اللعبة:", data);
+            console.log("تحديث الحالة:", data);
         });
-
         socket.on('update_view', function(data) {
-            console.log("حركة جديدة من المضيف:", data);
+            console.log("حركة المضيف:", data);
         });
     </script>
+</body>
+</html>
