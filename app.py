@@ -92,6 +92,9 @@ def handle_sync(data):
             "general_timer_end": 0
         }
         socketio.emit('broadcast_state', server_data)
-
+    @socketio.on('player_action')
+    def handle_player_action(data):
+        socketio.emit('update_view', data)
+        
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
