@@ -3,21 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر وسيشن البصرة</title>
-    <!-- استيراد تايليند سي إس إس وتصميم الأصفاد -->
+    <title>عالم حمودي الجنوبي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
 </head>
 <body class="bg-[#0b0f19] text-white min-h-screen p-4 flex flex-col items-center justify-center">
 
-    <!-- محتوى الصفحة الرئيسي الخاص بك -->
-    <div class="text-center">
-        <h1 class="text-3xl font-bold mb-4">لوحة التحكم والتحكم باللعبة</h1>
-        <p class="text-gray-400 mb-6">عدد المشاهدين المتصلين: <span id="viewer-count" class="text-amber-400 font-bold">0</span></p>
+    <div class="w-full max-w-md bg-[#131b2e] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-center">
 
-        <!-- أزرار أو عناصر التجربة -->
-        <div class="space-x-4 space-x-reverse">
-            <button onclick="triggerAction()" class="bg-amber-500 text-black px-6 py-2 rounded-lg font-bold hover:bg-amber-400">تنفيذ حركة</button>
+        <!-- مؤشر عدد المشاهدين المتصلين لحظياً -->
+        <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 shadow-inner">
+            <span class="text-xs text-slate-400 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                الأعضاء المتواجدون الآن:
+            </span>
+            <span id="viewer-count" class="text-amber-400 font-black text-sm">0</span>
+        </div>
+
+        <!-- الترويسة -->
+        <div class="flex flex-col gap-1 mb-1">
+            <h1 class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
+                ✨ عالم حمودي الجنوبي ✨
+            </h1>
+            <p class="text-xs text-slate-400">اختر القسم الذي تريد الدخول إليه:</p>
+        </div>
+
+        <!-- الأقسام الرئيسية -->
+        <a href="/questions" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>❓</span> الأسئلة العامة والمسابقات
+        </a>
+
+        <a href="/random" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>🧠</span> ألعاب التركيز والالغاز
+        </a>
+
+        <a href="/ruligs" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>🎲</span> قسم الأحكام والتحديات
+        </a>
+
+        <a href="/confess" class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>🪑</span> قسم كرسي الاعتراف
+        </a>
+
+        <a href="/dice" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>🎯</span> نرد الحظ
+        </a>
+
+        <a href="/sevens" class="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <span>🔥</span> السبعات 77
+        </a>
+
+        <a href="/vote" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 border border-cyan-400/30">
+            <span>📊</span> مركز التصويت والمعارك الفوري
+        </a>
+
+        <!-- زر فتح نافذة البث المباشر -->
+        <button onclick="toggleLiveStream()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 border border-amber-400/30 cursor-pointer">
+            <span>📡</span> البث المباشر ومتابعة اللعب
+        </button>
+
+        <!-- لوحة التحكم -->
+        <div class="pt-2 border-t border-slate-800/80 mt-1">
+            <a href="/login" class="text-xs text-slate-400 hover:text-amber-400 transition-colors flex items-center justify-center gap-1.5 font-bold">
+                <span>🔒</span> لوحة التحكم الخاصة بالمالك والمشرفين
+            </a>
+        </div>
+
+    </div>
+
+    <!-- نافذة البث المباشر المنبثقة -->
+    <div id="live-stream-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#131b2e] border border-amber-500/40 rounded-2xl p-6 max-w-md w-full shadow-2xl relative text-center flex flex-col gap-4">
+            <h3 class="text-lg font-bold text-amber-400">📡 لوحة البث والنشاط الحي</h3>
+
+            <div id="live-stream-content" class="bg-[#0b0f19] p-4 rounded-xl border border-slate-800 text-xs text-slate-300 min-h-[120px] flex flex-col justify-center items-center gap-2">
+                <span class="text-slate-500">في انتظار بدء الألعاب والتحركات...</span>
+            </div>
+
+            <button onclick="toggleLiveStream()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-xl transition text-xs cursor-pointer">
+                إغلاق النافذة
+            </button>
         </div>
     </div>
 
@@ -31,14 +97,19 @@
         </div>
     </div>
 
+    <!-- مكتبة السوكيت -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        // تقدر تغير الكود من هنا باللي يعجبك وتدزه للمشاهدين
-        const correctCode = "313";
+        const correctCode = "313"; // تقدر تغير الكود من هنا وقت ما تعجبك
         const isOwner = localStorage.getItem('is_admin_host') === 'true';
 
-        // إذا كنت أنت المضيف، نخفي نافذة الكود فوراً
         if (isOwner) {
             document.getElementById('code-modal').style.display = 'none';
+        }
+
+        function toggleLiveStream() {
+            const modal = document.getElementById('live-stream-modal');
+            modal.classList.toggle('hidden');
         }
 
         function checkViewerCode() {
@@ -46,7 +117,7 @@
             if (userInput === correctCode) {
                 document.getElementById('code-modal').style.display = 'none';
 
-                // قفل العناصر تماماً عن المشاهد
+                // قفل كل الأزرار والعناصر عن المشاهد
                 document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
                     if(el.id !== 'viewer-code-input') {
                         el.removeAttribute('href');
@@ -68,11 +139,13 @@
                 if (sessionStorage.getItem('viewer_authenticated') === 'true') {
                     document.getElementById('code-modal').style.display = 'none';
                     document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
-                        el.removeAttribute('href');
-                        el.removeAttribute('onclick');
-                        el.style.pointerEvents = 'none';
-                        el.style.opacity = '0.6';
-                        el.style.cursor = 'not-allowed';
+                        if(el.id !== 'viewer-code-input') {
+                            el.removeAttribute('href');
+                            el.removeAttribute('onclick');
+                            el.style.pointerEvents = 'none';
+                            el.style.opacity = '0.6';
+                            el.style.cursor = 'not-allowed';
+                        }
                     });
                 }
             }
@@ -80,28 +153,22 @@
 
         const socket = io();
 
-        // تحديث عداد المشاهدين
         socket.on('update_viewers', function(data) {
             const counter = document.getElementById('viewer-count');
-            if (counter) {
-                counter.innerText = data.count;
+            if (counter) counter.innerText = data.count;
+        });
+
+        socket.on('broadcast_state', function(data) {
+            console.log("تحديث الحالة:", data);
+            const content = document.getElementById('live-stream-content');
+            if (content && data.text) {
+                content.innerHTML = `<p class="text-amber-400">${data.text}</p>`;
             }
         });
 
-        // استقبال الحالة العامة وتحديث الواجهة عند المشاهد
-        socket.on('broadcast_state', function(data) {
-            console.log("تحديث الحالة:", data);
-        });
-
-        // استقبال الحركات الفورية للمضيف
         socket.on('update_view', function(data) {
             console.log("حركة المضيف:", data);
-            alert("تم تنفيذ حركة من المضيف!");
         });
-
-        function triggerAction() {
-            socket.emit('player_action', { type: 'click_action', message: 'تم الضغط من المضيف' });
-        }
     </script>
 </body>
 </html>
