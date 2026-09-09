@@ -116,22 +116,33 @@
                 `;
             }
         });
-    </script>
-<script>
+   <script>
         const isOwner = localStorage.getItem('is_admin_host') === 'true';
 
         window.addEventListener('DOMContentLoaded', () => {
             if (!isOwner) {
-                // استهداف الأزرار، حقول الإدخال، وكل الروابط التي تعمل كأزرار في القائمة
                 const elements = document.querySelectorAll('button, input, select, textarea, a, .btn, .clickable');
                 elements.forEach(el => {
-                    el.removeAttribute('href'); // يمنع الانتقال لأي رابط تماماً
-                    el.style.pointerEvents = 'none'; // يمنع النقرات
-                    el.style.opacity = '0.6'; // جعلها باهتة للمتابع
+                    el.removeAttribute('href');
+                    el.style.pointerEvents = 'none';
+                    el.style.opacity = '0.6';
                     el.style.cursor = 'not-allowed';
                 });
                 console.log("وضع المشاهدة مفعل بالكامل");
             }
+        });
+    </script>
+
+    <!-- كود سوكيت الجافاسكريبت للتحديث المباشر -->
+    <script>
+        const socket = io();
+
+        socket.on('broadcast_state', function(data) {
+            console.log("تم تحديث حالة اللعبة:", data);
+        });
+
+        socket.on('update_view', function(data) {
+            console.log("حركة جديدة من المضيف:", data);
         });
     </script>
 </body>
