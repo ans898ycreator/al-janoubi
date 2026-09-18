@@ -168,6 +168,10 @@
 
         socket.on('update_view', function(data) {
             console.log("حركة المضيف:", data);
+            const content = document.getElementById('live-stream-content');
+            if (content) {
+                content.innerHTML = `<p class="text-amber-400 font-bold text-sm animate-pulse">${data.message || 'تم تحديث الحركة من المضيف'}</p>`;
+            }
         });
     </script>
 </body>
