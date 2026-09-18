@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم المضيف - عالم حمودي الجنوبي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-[#0b0f19] text-white min-h-screen p-6 flex flex-col items-center justify-center">
+    <div class="max-w-md w-full bg-[#131b2e] border border-slate-800 rounded-2xl p-6 text-center shadow-xl">
+        <h1 class="text-xl font-bold text-amber-400 mb-4">👑 لوحة تحكم المضيف</h1>
+        <p class="text-sm text-slate-400 mb-6">المشاهدون المتصلون حالياً: <span id="viewer-count" class="text-emerald-400 font-bold">0</span></p>
+
+        <!-- أزرار التجربة للاختبار الفوري -->
+        <div class="flex flex-col gap-3">
+            <button onclick="sendAction('تم فتح قسم الأسئلة العامة ❓')" class="bg-amber-600 hover:bg-amber-500 py-3 rounded-xl font-bold transition">
+                إرسال حركة: فتح الأسئلة
+            </button>
+            <button onclick="sendAction('تم رمي النرد والنتيجة: 6 🎲')" class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-bold transition">
+                إرسال حركة: رمي النرد
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('update_viewers', function(data) {
+            document.getElementById('viewer-count').innerText = data.count;
+        });
+
+        function sendAction(msg) {
+            socket.emit('host_action', { message: msg });
+            alert("تم إرسال الحركة للمشاهدين بنجاح!");
+        }
+    </script>
+</body>
+</html>
