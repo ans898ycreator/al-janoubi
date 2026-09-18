@@ -91,7 +91,7 @@ def handle_sync(data):
             "battle_timer_end": 0,
             "general_timer_end": 0
         }
-        socketio.emit('broadcast_state', server_data)
+    socketio.emit('broadcast_state', server_data)
 
 # تم تعديل مكانها لتكون منفصلة وصحيحة
 @socketio.on('player_action')
