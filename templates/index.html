@@ -30,31 +30,31 @@
         </div>
 
         <!-- الأقسام الرئيسية -->
-        <a href="/questions" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/questions" onclick="sendHostAction('الدخول إلى الأسئلة العامة ❓')" class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>❓</span> الأسئلة العامة والمسابقات
         </a>
 
-        <a href="/random" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/random" onclick="sendHostAction('الدخول إلى ألعاب التركيز والالغاز 🧠')" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>🧠</span> ألعاب التركيز والالغاز
         </a>
 
-        <a href="/ruligs" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/ruligs" onclick="sendHostAction('الدخول إلى قسم الأحكام والتحديات 🎲')" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>🎲</span> قسم الأحكام والتحديات
         </a>
 
-        <a href="/confess" class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/confess" onclick="sendHostAction('الدخول إلى قسم كرسي الاعتراف 🪑')" class="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>🪑</span> قسم كرسي الاعتراف
         </a>
 
-        <a href="/dice" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/dice" onclick="sendHostAction('الدخول إلى قسم نرد الحظ 🎯')" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>🎯</span> نرد الحظ
         </a>
 
-        <a href="/sevens" class="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+        <a href="/sevens" onclick="sendHostAction('الدخول إلى قسم السبعات 77 🔥')" class="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
             <span>🔥</span> السبعات 77
         </a>
 
-        <a href="/vote" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 border border-cyan-400/30">
+        <a href="/vote" onclick="sendHostAction('الدخول إلى مركز التصويت والمعارك 📊')" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 border border-cyan-400/30">
             <span>📊</span> مركز التصويت والمعارك الفوري
         </a>
 
@@ -97,10 +97,10 @@
         </div>
     </div>
 
-    <!-- مكتبة السوكيت -->
+    <!-- مكتبة السوكيت والبرمجة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        const correctCode = "313"; // تقدر تغير الكود من هنا وقت ما تعجبك
+        const correctCode = "313";
         const isOwner = localStorage.getItem('is_admin_host') === 'true';
 
         if (isOwner) {
@@ -116,18 +116,6 @@
             const userInput = document.getElementById('viewer-code-input').value.trim();
             if (userInput === correctCode) {
                 document.getElementById('code-modal').style.display = 'none';
-
-                // قفل كل الأزرار والعناصر عن المشاهد
-                document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
-                    if(el.id !== 'viewer-code-input') {
-                        el.removeAttribute('href');
-                        el.removeAttribute('onclick');
-                        el.style.pointerEvents = 'none';
-                        el.style.opacity = '0.6';
-                        el.style.cursor = 'not-allowed';
-                    }
-                });
-
                 sessionStorage.setItem('viewer_authenticated', 'true');
             } else {
                 document.getElementById('error-msg').style.display = 'block';
@@ -135,42 +123,29 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (!isOwner) {
-                if (sessionStorage.getItem('viewer_authenticated') === 'true') {
-                    document.getElementById('code-modal').style.display = 'none';
-                    document.querySelectorAll('button, input, select, textarea, a, form, [onclick]').forEach(el => {
-                        if(el.id !== 'viewer-code-input') {
-                            el.removeAttribute('href');
-                            el.removeAttribute('onclick');
-                            el.style.pointerEvents = 'none';
-                            el.style.opacity = '0.6';
-                            el.style.cursor = 'not-allowed';
-                        }
-                    });
-                }
+            if (!isOwner && sessionStorage.getItem('viewer_authenticated') !== 'true') {
+                document.getElementById('code-modal').style.display = 'flex';
+            } else {
+                document.getElementById('code-modal').style.display = 'none';
             }
         });
 
         const socket = io();
 
+        function sendHostAction(actionText) {
+            socket.emit('player_action', { message: actionText });
+        }
+
+        socket.icon = 'update_viewers';
         socket.on('update_viewers', function(data) {
             const counter = document.getElementById('viewer-count');
             if (counter) counter.innerText = data.count;
         });
 
-        socket.on('broadcast_state', function(data) {
-            console.log("تحديث الحالة:", data);
-            const content = document.getElementById('live-stream-content');
-            if (content && data.text) {
-                content.innerHTML = `<p class="text-amber-400">${data.text}</p>`;
-            }
-        });
-
         socket.on('update_view', function(data) {
-            console.log("حركة المضيف:", data);
             const content = document.getElementById('live-stream-content');
-            if (content) {
-                content.innerHTML = `<p class="text-amber-400 font-bold text-sm animate-pulse">${data.message || 'تم تحديث الحركة من المضيف'}</p>`;
+            if (content && data.message) {
+                content.innerHTML = `<p class="text-amber-400 font-bold text-sm animate-pulse">${data.message}</p>`;
             }
         });
     </script>
